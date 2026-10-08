@@ -211,8 +211,12 @@ def print_overall_timing(timing_summary: dict) -> None:
     )
 
 
+def bucket_rows(timings_dir: Path) -> list[dict[str, str]]:
+    return load_csv(timings_dir / "bucket_timing_summary.csv")
+
+
 def print_bucket_timing(timings_dir: Path) -> None:
-    rows = load_csv(timings_dir / "bucket_timing_summary.csv")
+    rows = bucket_rows(timings_dir)
     standard_by_bucket = {
         row["payload_bucket"]: row
         for row in rows
@@ -263,20 +267,98 @@ def print_bucket_timing(timings_dir: Path) -> None:
     )
 
 
-def print_methodology_matrix() -> None:
-    print_title("TABLE 5: MEASURED PARAMETERS")
+def print_bucket_pivot(timings_dir: Path) -> None:
+    rows = bucket_rows(timings_dir)
+    by_bucket_mode = {
+        (row["payload_bucket"], row["mode"]): row
+        for row in rows
+    }
+    table_rows = []
+
+    for bucket in ["1-128", "129-512", "513-1024", ">1024"]:
+        standard = by_bucket_mode[(bucket, "standard_aes_10")]
+        reduced = by_bucket_mode[(bucket, "fixed_reduced_aes_4")]
+        adaptive = by_bucket_mode[(bucket, "adaptaes")]
+
+        standard_enc = ns_to_ms(float(standard["mean_encryption_time_ns"]))
+        standard_dec = ns_to_ms(float(standard["mean_decryption_time_ns"]))
+        reduced_enc = ns_to_ms(float(reduced["mean_encryption_time_ns"]))
+        reduced_dec = ns_to_ms(float(reduced["mean_decryption_time_ns"]))
+        adaptive_enc = ns_to_ms(float(adaptive["mean_encryption_time_ns"]))
+        adaptive_dec = ns_to_ms(float(adaptive["mean_decryption_time_ns"]))
+
+        table_rows.append(
+            [
+                BUCKET_LABELS[bucket],
+                int(float(standard["payload_count"])),
+                float(standard["mean_payload_length"]),
+                f"{standard_enc:.2f} / {standard_dec:.2f}",
+                f"{reduced_enc:.2f} / {reduced_dec:.2f}",
+                f"{adaptive_enc:.2f} / {adaptive_dec:.2f}",
+                f'{float(adaptive["mean_rounds_used"]):.0f}',
+                f"{(1 - adaptive_enc / standard_enc) * 100:.2f}%",
+                f"{(1 - adaptive_dec / standard_dec) * 100:.2f}%",
+            ]
+        )
+
+    print_title("TABLE 5: SIDE-BY-SIDE RESULT BY PAYLOAD RANGE")
     print_table(
-        ["Parameter", "Standard AES", "Reduced AES", "AdaptAES", "Importance"],
         [
-            ["Payload size (bytes)", "Yes", "Yes", "Yes", "Essential"],
-            ["Number of rounds", "10", "4", "4/6/8/10", "Essential"],
-            ["Encryption time", "Yes", "Yes", "Yes", "Essential"],
-            ["Decryption time", "Yes", "Yes", "Yes", "Essential"],
-            ["Encryption throughput", "Yes", "Yes", "Yes", "Essential"],
-            ["Speedup", "Baseline", "Yes", "Yes", "Essential"],
-            ["Time reduction %", "Baseline", "Yes", "Yes", "Essential"],
-            ["Payload-range analysis", "Yes", "Yes", "Yes", "Essential"],
+            "Payload Range",
+            "Payloads",
+            "Avg Size (B)",
+            "Standard AES Enc/Dec (ms)",
+            "Reduced AES Enc/Dec (ms)",
+            "AdaptAES Enc/Dec (ms)",
+            "AdaptAES Rounds",
+            "AdaptAES Enc Reduction",
+            "AdaptAES Dec Reduction",
         ],
+        table_rows,
+    )
+
+
+def print_final_result_summary(timing_summary: dict) -> None:
+    modes = timing_summary["aggregate_modes"]
+    standard = modes["standard_aes_10"]
+    table_rows = []
+
+    for mode in ["standard_aes_10", "fixed_reduced_aes_4", "adaptaes"]:
+        stats = modes[mode]
+        enc_ns = float(stats["mean_encryption_time_ns"])
+        dec_ns = float(stats["mean_decryption_time_ns"])
+        standard_enc_ns = float(standard["mean_encryption_time_ns"])
+        standard_dec_ns = float(standard["mean_decryption_time_ns"])
+        table_rows.append(
+            [
+                MODE_LABELS[mode],
+                ROUND_LABELS[mode],
+                int(stats["payload_count"]),
+                ns_to_ms(enc_ns),
+                ns_to_ms(dec_ns),
+                float(stats["mean_throughput_mb_s"]),
+                f"{standard_enc_ns / enc_ns:.2f}x",
+                f"{(1 - enc_ns / standard_enc_ns) * 100:.2f}%",
+                f"{standard_dec_ns / dec_ns:.2f}x",
+                f"{(1 - dec_ns / standard_dec_ns) * 100:.2f}%",
+            ]
+        )
+
+    print_title("TABLE 6: FINAL NUMERICAL RESULT SUMMARY")
+    print_table(
+        [
+            "Method",
+            "Rounds",
+            "Payloads Tested",
+            "Avg Enc Time (ms)",
+            "Avg Dec Time (ms)",
+            "Avg Throughput (MB/s)",
+            "Enc Speedup",
+            "Enc Time Reduction",
+            "Dec Speedup",
+            "Dec Time Reduction",
+        ],
+        table_rows,
     )
 
 
@@ -291,7 +373,8 @@ def main() -> None:
     print_payload_distribution(args.extracted_dir)
     print_overall_timing(timing_summary)
     print_bucket_timing(args.timings_dir)
-    print_methodology_matrix()
+    print_bucket_pivot(args.timings_dir)
+    print_final_result_summary(timing_summary)
 
 
 if __name__ == "__main__":
