@@ -269,9 +269,9 @@ def main() -> None:
         out_dir,
         column="time_reduction_percent_vs_aes10",
         ylabel="Encryption Time Reduction vs AES-10 (%)",
-        title="Encryption Time Reduction Relative to Standard AES-10",
+        title="AdaptAES Encryption Time Reduction Relative to Standard AES-10",
         filename="graph4_encryption_reduction.png",
-        modes=["fixed_reduced_aes_4", "adaptaes"],
+        modes=["adaptaes"],
     )
     graph5_security_metrics(performance_rows, out_dir)
 
