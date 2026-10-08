@@ -174,8 +174,9 @@ def summarize(rows: list[dict[str, object]], timings: dict[tuple[str, int, str],
                     entry.update({"decryption_speedup_vs_aes10": ref_dec / dec,
                                   "decryption_time_reduction_percent_vs_aes10": 100 * (1 - dec / ref_dec)})
             sec_rows = [r for r in security if r["payload_bucket"] == group and r["mode"] == mode]
-            for metric in ("avalanche_percent", "entropy_bits_per_byte", "chi_square",
-                           "plaintext_ciphertext_correlation", "npcr_byte_percent", "uaci_byte_percent"):
+            for metric in ("avalanche_percent", "key_avalanche_percent", "entropy_bits_per_byte",
+                           "chi_square", "plaintext_ciphertext_correlation",
+                           "npcr_byte_percent", "uaci_byte_percent"):
                 entry[metric] = statistics.fmean(float(r[metric]) for r in sec_rows) if sec_rows else None
             perf_summary.append(entry)
     return security_summary, perf_summary, security
