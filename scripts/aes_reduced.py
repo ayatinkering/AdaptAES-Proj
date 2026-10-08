@@ -1,18 +1,21 @@
-# reduced_aes.py
-# Experimental fixed 4-round AES variant.
+# aes_reduced.py
 
-from aes_core import encrypt_block
+from aes_core import (
+    encrypt_block,
+    decrypt_block,
+    pad_data,
+    unpad_data
+)
 
 
 REDUCED_ROUNDS = 4
 
 
-def reduced_aes_encrypt(block, key):
-    """
-    Encrypt one 16-byte block using
-    the experimental 4-round AES construction.
-    """
+# -----------------------------
+# BLOCK ENCRYPTION
+# -----------------------------
 
+def reduced_aes_encrypt_block(block, key):
     return encrypt_block(
         block,
         key,
@@ -20,24 +23,65 @@ def reduced_aes_encrypt(block, key):
     )
 
 
-if __name__ == "__main__":
+# -----------------------------
+# BLOCK DECRYPTION
+# -----------------------------
 
-    key = bytes.fromhex(
-        "000102030405060708090a0b0c0d0e0f"
+def reduced_aes_decrypt_block(block, key):
+    return decrypt_block(
+        block,
+        key,
+        rounds=REDUCED_ROUNDS
     )
 
-    plaintext = bytes.fromhex(
-        "00112233445566778899aabbccddeeff"
-    )
 
-    ciphertext = reduced_aes_encrypt(
-        plaintext,
-        key
-    )
+# -----------------------------
+# ARBITRARY-LENGTH ENCRYPTION
+# -----------------------------
 
-    print("Fixed Reduced-Round AES")
-    print("-----------------------")
-    print("Rounds    :", REDUCED_ROUNDS)
-    print("Plaintext :", plaintext.hex())
-    print("Key       :", key.hex())
-    print("Ciphertext:", ciphertext.hex())
+def reduced_aes_encrypt(data, key):
+
+    padded_data = pad_data(data)
+
+    ciphertext = bytearray()
+
+    for i in range(0, len(padded_data), 16):
+
+        block = padded_data[i:i + 16]
+
+        encrypted_block = reduced_aes_encrypt_block(
+            block,
+            key
+        )
+
+        ciphertext.extend(encrypted_block)
+
+    return bytes(ciphertext)
+
+
+# -----------------------------
+# ARBITRARY-LENGTH DECRYPTION
+# -----------------------------
+
+def reduced_aes_decrypt(ciphertext, key):
+
+    if len(ciphertext) % 16 != 0:
+        raise ValueError(
+            "Ciphertext length must be a multiple of 16."
+        )
+
+    plaintext = bytearray()
+
+    for i in range(0, len(ciphertext), 16):
+
+        block = ciphertext[i:i + 16]
+
+        decrypted_block = reduced_aes_decrypt_block(
+            block,
+            key
+        )
+
+        plaintext.extend(decrypted_block)
+
+    return unpad_data(bytes(plaintext))
+

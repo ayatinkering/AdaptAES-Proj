@@ -1,120 +1,88 @@
-# adaptaes.py
-# AdaptAES: packet-payload-size based AES round selection
+# aes_adaptive.py
 
-from aes_core import encrypt_block
+from aes_core import (
+    encrypt_block,
+    decrypt_block,
+    pad_data,
+    unpad_data
+)
 
+
+# -----------------------------
+# ADAPTIVE ROUND SELECTION
+# -----------------------------
 
 def select_rounds(payload_size):
-    """
-    Select AES round count based on payload size.
 
-    1 - 128 bytes       -> 4 rounds
-    129 - 512 bytes     -> 6 rounds
-    513 - 1024 bytes    -> 8 rounds
-    > 1024 bytes        -> 10 rounds
-    """
+    if payload_size <= 0:
+        raise ValueError(
+            "Payload size must be greater than 0."
+        )
 
-    if payload_size >= 1 and payload_size <= 128:
+    if payload_size <= 128:
         return 4
 
-    elif payload_size >= 129 and payload_size <= 512:
+    elif payload_size <= 512:
         return 6
 
-    elif payload_size >= 513 and payload_size <= 1024:
+    elif payload_size <= 1024:
         return 8
 
-    elif payload_size > 1024:
+    else:
         return 10
 
-    else:
-        raise ValueError("Payload size must be greater than 0.")
 
+# -----------------------------
+# BLOCK ENCRYPTION
+# -----------------------------
 
-def pad_data(data):
-    """
-    PKCS#7 padding.
+def adaptaes_encrypt_block(block, key, rounds):
 
-    AES block size = 16 bytes.
-    """
-
-    block_size = 16
-
-    padding_length = (
-        block_size - (len(data) % block_size)
+    return encrypt_block(
+        block,
+        key,
+        rounds=rounds
     )
 
-    padding = bytes(
-        [padding_length] * padding_length
+
+# -----------------------------
+# BLOCK DECRYPTION
+# -----------------------------
+
+def adaptaes_decrypt_block(block, key, rounds):
+
+    return decrypt_block(
+        block,
+        key,
+        rounds=rounds
     )
 
-    return data + padding
 
+# -----------------------------
+# ARBITRARY-LENGTH ENCRYPTION
+# -----------------------------
 
-def unpad_data(data):
-    """
-    Remove PKCS#7 padding.
-    """
+def adaptaes_encrypt(data, key):
 
-    if len(data) == 0:
-        raise ValueError("Cannot unpad empty data.")
+    # Original payload size is used
+    # to select the number of rounds.
 
-    padding_length = data[-1]
+    payload_size = len(data)
 
-    if padding_length < 1 or padding_length > 16:
-        raise ValueError("Invalid padding.")
+    rounds = select_rounds(payload_size)
 
-    if data[-padding_length:] != bytes(
-        [padding_length] * padding_length
-    ):
-        raise ValueError("Invalid padding.")
-
-    return data[:-padding_length]
-
-
-def adaptaes_encrypt(payload, key):
-    """
-    Encrypt an arbitrary-length payload using AdaptAES.
-
-    The number of AES rounds is selected
-    from the ORIGINAL payload size.
-    """
-
-    if len(key) != 16:
-        raise ValueError(
-            "AES-128 key must be exactly 16 bytes."
-        )
-
-    if len(payload) == 0:
-        raise ValueError(
-            "Payload cannot be empty."
-        )
-
-    # IMPORTANT:
-    # Round selection uses the original payload size,
-    # not the padded size.
-
-    original_size = len(payload)
-
-    rounds = select_rounds(original_size)
-
-    # Pad payload to AES block size
-    padded_payload = pad_data(payload)
+    padded_data = pad_data(data)
 
     ciphertext = bytearray()
 
-    # Encrypt each 16-byte block
-    for i in range(
-        0,
-        len(padded_payload),
-        16
-    ):
+    for i in range(0, len(padded_data), 16):
 
-        block = padded_payload[i:i + 16]
+        block = padded_data[i:i + 16]
 
-        encrypted_block = encrypt_block(
+        encrypted_block = adaptaes_encrypt_block(
             block,
             key,
-            rounds=rounds
+            rounds
         )
 
         ciphertext.extend(encrypted_block)
@@ -122,53 +90,38 @@ def adaptaes_encrypt(payload, key):
     return bytes(ciphertext), rounds
 
 
-def adaptaes_decrypt(ciphertext, key, rounds):
-    """
-    Decrypt an AdaptAES ciphertext.
+# -----------------------------
+# ARBITRARY-LENGTH DECRYPTION
+# -----------------------------
 
-    The round count used during encryption
-    must be supplied for decryption.
-    """
+def adaptaes_decrypt(ciphertext, key, payload_size):
 
-    # NOTE:
-    # This requires an inverse AES implementation.
-    # It will be added when we implement the
-    # decryption side.
-    
-    raise NotImplementedError(
-        "Decryption will be implemented with "
-        "the inverse AES operations."
-    )
-
-
-if __name__ == "__main__":
-
-    key = bytes.fromhex(
-        "000102030405060708090a0b0c0d0e0f"
-    )
-
-    test_sizes = [
-        1,
-        16,
-        64,
-        128,
-        129,
-        256,
-        512,
-        513,
-        768,
-        1024,
-        1025,
-        2048
-    ]
-
-    print("AdaptAES Round Selection")
-    print("========================")
-
-    for size in test_sizes:
-
-        rounds = select_rounds(size)
-
-        print(
-            f"{size:4d} bytes -> {rounds:2d} rounds"
+    if len(ciphertext) % 16 != 0:
+        raise ValueError(
+            "Ciphertext length must be a multiple of 16."
         )
+
+    # The receiver needs the original payload size
+    # to determine which round count was used.
+
+    rounds = select_rounds(payload_size)
+
+    plaintext = bytearray()
+
+    for i in range(0, len(ciphertext), 16):
+
+        block = ciphertext[i:i + 16]
+
+        decrypted_block = adaptaes_decrypt_block(
+            block,
+            key,
+            rounds
+        )
+
+        plaintext.extend(decrypted_block)
+
+    plaintext = unpad_data(bytes(plaintext))
+
+    return plaintext, rounds
+
+
