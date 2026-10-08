@@ -38,43 +38,6 @@ The workflow is:
 
 ## Repository Structure
 
-```text
-.
-├── docs/
-│   ├── AdaptAES_full_project_report.md
-│   ├── benchmarking_prd.md
-│   ├── extraction_prd.md
-│   ├── hikari_payload_methodology.md
-│   ├── payload_generation_prd.md
-│   ├── security_performance_analysis.md
-│   └── timing_benchmark_usage.md
-├── scripts/
-│   ├── aes_core.py
-│   ├── aes_reduced.py
-│   ├── aes_adaptive.py
-│   ├── extract_payload_lengths.py
-│   ├── batch_extract_payload_lengths.py
-│   ├── generate_plaintext_payloads.py
-│   ├── validate_generated_payloads.py
-│   ├── benchmark_dataset_timings.py
-│   ├── security_evaluation.py
-│   ├── security_performance_analysis.py
-│   ├── print_research_results.py
-│   ├── print_analysis_results.py
-│   └── generate_graphs.py
-└── results/
-    ├── extracted/
-    ├── payloads/
-    ├── timings/
-    ├── security/
-    ├── analysis/
-    └── plots/
-```
-
-Raw PCAP files are intentionally excluded from Git because they are large dataset artifacts.
-
-## Important Files
-
 | File | Purpose |
 |---|---|
 | `scripts/aes_core.py` | Configurable-round AES implementation |
@@ -351,18 +314,4 @@ The statistical-indicator results show avalanche values near 50%, entropy values
 - Statistical indicators are not a substitute for cryptanalysis.
 - Raw PCAP files and generated payload binaries are intentionally not tracked in Git.
 
-## Recommended Evaluation Files
-
-For a teacher/project evaluation, show:
-
-```text
-docs/AdaptAES_full_project_report.md
-README.md
-scripts/aes_adaptive.py
-scripts/benchmark_dataset_timings.py
-scripts/security_performance_analysis.py
-scripts/generate_graphs.py
-results/analysis/bucket_security_performance_summary.csv
-results/plots/
-```
 
