@@ -62,6 +62,19 @@ def style_axes(ax) -> None:
     ax.spines["right"].set_visible(False)
 
 
+def set_zoomed_ylim(ax, values: list[float], reference: float | None = None) -> None:
+    all_values = list(values)
+    if reference is not None:
+        all_values.append(reference)
+    minimum = min(all_values)
+    maximum = max(all_values)
+    span = maximum - minimum
+    if span == 0:
+        span = abs(maximum) * 0.01 or 0.01
+    padding = span * 0.35
+    ax.set_ylim(minimum - padding, maximum + padding)
+
+
 def save(fig, path: Path) -> None:
     fig.tight_layout()
     fig.savefig(path, dpi=300, bbox_inches="tight")
@@ -177,8 +190,10 @@ def graph5_security_metrics(rows: list[dict[str, str]], out_dir: Path) -> None:
         values = [by_mode[mode][column] for mode in MODE_ORDER]
         for index, (mode, value) in enumerate(zip(MODE_ORDER, values)):
             ax.bar(index, value, width=0.55, label=MODE_LABELS[mode])
+            ax.text(index, value, f"{value:.4f}", ha="center", va="bottom", fontsize=8)
         if reference is not None:
             ax.axhline(reference, linestyle="--", linewidth=1)
+        set_zoomed_ylim(ax, values, reference)
         ax.set_xticks(x)
         ax.set_xticklabels([MODE_LABELS[mode] for mode in MODE_ORDER], rotation=15, ha="right")
         ax.set_xlabel("Method")
@@ -209,7 +224,6 @@ def main() -> None:
     args = parser.parse_args()
 
     performance_path = args.analysis_dir / "bucket_security_performance_summary.csv"
-    security_path = args.analysis_dir / "roundwise_security_summary.csv"
     out_dir = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -255,9 +269,9 @@ def main() -> None:
         out_dir,
         column="time_reduction_percent_vs_aes10",
         ylabel="Encryption Time Reduction vs AES-10 (%)",
-        title="AdaptAES Encryption Time Reduction Relative to Standard AES-10",
+        title="Encryption Time Reduction Relative to Standard AES-10",
         filename="graph4_encryption_reduction.png",
-        modes=["adaptaes"],
+        modes=["fixed_reduced_aes_4", "adaptaes"],
     )
     graph5_security_metrics(performance_rows, out_dir)
 
