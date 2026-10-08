@@ -8,29 +8,29 @@
   "modes": {
     "standard_aes_10": {
       "payload_count": 50,
-      "mean_encryption_time_ns": 63218819.24,
-      "median_encryption_time_ns": 31893131.5,
-      "mean_decryption_time_ns": 112382479.96,
-      "median_decryption_time_ns": 56820033.0,
-      "mean_throughput_mb_s": 0.040304318718670205,
+      "mean_encryption_time_ns": 62555535.62,
+      "median_encryption_time_ns": 31689674.0,
+      "mean_decryption_time_ns": 111472124.66,
+      "median_decryption_time_ns": 56169006.0,
+      "mean_throughput_mb_s": 0.04071483494118862,
       "mean_rounds_used": 10.0
     },
     "fixed_reduced_aes_4": {
       "payload_count": 50,
-      "mean_encryption_time_ns": 24728498.16,
-      "median_encryption_time_ns": 12499108.5,
-      "mean_decryption_time_ns": 41236834.04,
-      "median_decryption_time_ns": 20746954.0,
-      "mean_throughput_mb_s": 0.10320026682454525,
+      "mean_encryption_time_ns": 24873091.7,
+      "median_encryption_time_ns": 12421969.0,
+      "mean_decryption_time_ns": 40831857.26,
+      "median_decryption_time_ns": 20582443.0,
+      "mean_throughput_mb_s": 0.10327589065504693,
       "mean_rounds_used": 4.0
     },
     "adaptaes": {
       "payload_count": 50,
-      "mean_encryption_time_ns": 62903670.96,
-      "median_encryption_time_ns": 31893368.0,
-      "mean_decryption_time_ns": 111994575.54,
-      "median_decryption_time_ns": 56638423.5,
-      "mean_throughput_mb_s": 0.05375798610340634,
+      "mean_encryption_time_ns": 62271353.5,
+      "median_encryption_time_ns": 31543556.0,
+      "mean_decryption_time_ns": 111007841.9,
+      "median_decryption_time_ns": 56292476.0,
+      "mean_throughput_mb_s": 0.054185527379165634,
       "mean_rounds_used": 8.4
     }
   }

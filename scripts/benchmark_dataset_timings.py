@@ -59,6 +59,16 @@ def throughput_mb_s(payload_length: int, elapsed_ns: int) -> float:
     return (payload_length / (1024 * 1024)) / (elapsed_ns / 1_000_000_000)
 
 
+def payload_bucket(payload_length: int) -> str:
+    if payload_length <= 128:
+        return "1-128"
+    if payload_length <= 512:
+        return "129-512"
+    if payload_length <= 1024:
+        return "513-1024"
+    return ">1024"
+
+
 def benchmark_payload(payload: bytes, payload_length: int) -> list[dict[str, object]]:
     results: list[dict[str, object]] = []
 
@@ -175,6 +185,7 @@ def benchmark_dataset(
                 "dataset_name",
                 "payload_id",
                 "payload_length",
+                "payload_bucket",
                 "mode",
                 "rounds_used",
                 "encryption_time_ns",
@@ -192,6 +203,7 @@ def benchmark_dataset(
                     "dataset_name": dataset_name,
                     "payload_id": int(row["payload_id"]),
                     "payload_length": payload_length,
+                    "payload_bucket": payload_bucket(payload_length),
                     **result,
                 }
                 writer.writerow(output_row)
@@ -247,6 +259,64 @@ def combine_mode_summaries(dataset_summaries: list[dict[str, object]]) -> dict[s
     return combined
 
 
+def summarize_by_bucket(timing_csv_paths: list[Path], out_csv_path: Path) -> list[dict[str, object]]:
+    groups: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for csv_path in timing_csv_paths:
+        with csv_path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                groups[(row["payload_bucket"], row["mode"])].append(row)
+
+    bucket_order = ["1-128", "129-512", "513-1024", ">1024"]
+    mode_order = ["standard_aes_10", "fixed_reduced_aes_4", "adaptaes"]
+    rows: list[dict[str, object]] = []
+
+    for bucket in bucket_order:
+        for mode in mode_order:
+            items = groups.get((bucket, mode), [])
+            if not items:
+                continue
+            enc = [int(item["encryption_time_ns"]) for item in items]
+            dec = [int(item["decryption_time_ns"]) for item in items]
+            throughput = [float(item["throughput_mb_s"]) for item in items]
+            rounds = [int(item["rounds_used"]) for item in items]
+            payload_lengths = [int(item["payload_length"]) for item in items]
+            rows.append(
+                {
+                    "payload_bucket": bucket,
+                    "mode": mode,
+                    "payload_count": len(items),
+                    "mean_payload_length": statistics.fmean(payload_lengths),
+                    "mean_rounds_used": statistics.fmean(rounds),
+                    "mean_encryption_time_ns": statistics.fmean(enc),
+                    "median_encryption_time_ns": statistics.median(enc),
+                    "mean_decryption_time_ns": statistics.fmean(dec),
+                    "median_decryption_time_ns": statistics.median(dec),
+                    "mean_throughput_mb_s": statistics.fmean(throughput),
+                }
+            )
+
+    with out_csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "payload_bucket",
+                "mode",
+                "payload_count",
+                "mean_payload_length",
+                "mean_rounds_used",
+                "mean_encryption_time_ns",
+                "median_encryption_time_ns",
+                "mean_decryption_time_ns",
+                "median_decryption_time_ns",
+                "mean_throughput_mb_s",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--payload-dir", required=True, type=Path)
@@ -275,11 +345,17 @@ def main() -> None:
             )
         )
 
+    timing_csv_paths = [Path(str(dataset_summary["timings_csv"])) for dataset_summary in summaries]
+    bucket_summary_csv = args.out_dir / "bucket_timing_summary.csv"
+    bucket_summary = summarize_by_bucket(timing_csv_paths, bucket_summary_csv)
+
     combined = {
         "payload_dir": str(args.payload_dir),
         "out_dir": str(args.out_dir),
         "payload_limit_per_dataset": args.limit,
         "aggregate_modes": combine_mode_summaries(summaries),
+        "bucket_summary_csv": str(bucket_summary_csv),
+        "bucket_summary": bucket_summary,
         "datasets": summaries,
     }
     args.out_dir.mkdir(parents=True, exist_ok=True)
