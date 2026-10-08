@@ -150,6 +150,47 @@ def grouped_bar(
     save(fig, out_dir / filename)
 
 
+def graph4_adaptaes_vs_standard(rows: list[dict[str, str]], out_dir: Path) -> None:
+    by_key = {(row["payload_bucket"], row["mode"]): row for row in rows}
+    x = list(range(len(BUCKET_ORDER)))
+    width = 0.34
+    standard_values = [100.0 for _ in BUCKET_ORDER]
+    adaptive_values = [
+        ns_to_ms(by_key[(bucket, "adaptaes")]["mean_encryption_time_ns"])
+        / ns_to_ms(by_key[(bucket, "standard_aes_10")]["mean_encryption_time_ns"])
+        * 100.0
+        for bucket in BUCKET_ORDER
+    ]
+
+    fig, ax = plt.subplots(figsize=(8.2, 4.8))
+    ax.bar(
+        [item - width / 2 for item in x],
+        standard_values,
+        width=width,
+        label="Standard AES",
+        color="tab:orange",
+    )
+    ax.bar(
+        [item + width / 2 for item in x],
+        adaptive_values,
+        width=width,
+        label="AdaptAES",
+    )
+    for index, value in enumerate(standard_values):
+        ax.text(index - width / 2, value, f"{value:.1f}%", ha="center", va="bottom", fontsize=8)
+    for index, value in enumerate(adaptive_values):
+        va = "bottom" if value >= 0 else "top"
+        ax.text(index + width / 2, value, f"{value:.1f}%", ha="center", va=va, fontsize=8)
+    ax.set_xticks(x)
+    ax.set_xticklabels([BUCKET_LABELS[bucket] for bucket in BUCKET_ORDER])
+    ax.set_xlabel("Payload Size Range")
+    ax.set_ylabel("Encryption Time (% of Standard AES-10)")
+    ax.set_title("AdaptAES Encryption Time Compared with Standard AES-10")
+    ax.legend()
+    style_axes(ax)
+    save(fig, out_dir / "graph4_encryption_reduction.png")
+
+
 def weighted_method_metrics(rows: list[dict[str, str]]) -> dict[str, dict[str, float]]:
     metrics = [
         "avalanche_percent",
@@ -264,15 +305,7 @@ def main() -> None:
         filename="graph3_decryption_time.png",
         convert=ns_to_ms,
     )
-    grouped_bar(
-        performance_rows,
-        out_dir,
-        column="time_reduction_percent_vs_aes10",
-        ylabel="Encryption Time Reduction vs AES-10 (%)",
-        title="AdaptAES Encryption Time Reduction Relative to Standard AES-10",
-        filename="graph4_encryption_reduction.png",
-        modes=["adaptaes"],
-    )
+    graph4_adaptaes_vs_standard(performance_rows, out_dir)
     graph5_security_metrics(performance_rows, out_dir)
 
 
