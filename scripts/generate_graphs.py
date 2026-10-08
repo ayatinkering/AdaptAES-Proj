@@ -26,9 +26,6 @@ MODE_LABELS = {
     "fixed_reduced_aes_4": "Reduced AES",
     "adaptaes": "AdaptAES",
 }
-SECURITY_ROUNDS = [4, 6, 8, 10]
-
-
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open("r", newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
@@ -53,13 +50,6 @@ def validate_performance(rows: list[dict[str, str]]) -> None:
     if missing:
         formatted = ", ".join(f"{bucket}/{mode}" for bucket, mode in missing)
         raise ValueError(f"Missing payload range/method rows: {formatted}")
-
-
-def validate_security(rows: list[dict[str, str]]) -> None:
-    present = {int(float(row["rounds"])) for row in rows}
-    missing = [rounds for rounds in SECURITY_ROUNDS if rounds not in present]
-    if missing:
-        raise ValueError(f"Missing security round rows: {missing}")
 
 
 def ns_to_ms(value: str) -> float:
@@ -99,7 +89,7 @@ def graph1_payload_round_selection(rows: list[dict[str, str]], out_dir: Path) ->
 
     ax_rounds.set_xticks(x)
     ax_rounds.set_xticklabels([BUCKET_LABELS[bucket] for bucket in BUCKET_ORDER])
-    ax_rounds.set_yticks(SECURITY_ROUNDS)
+    ax_rounds.set_yticks([4, 6, 8, 10])
     ax_rounds.set_ylabel("AdaptAES Rounds")
     ax_percent.set_ylabel("Payload Share (%)")
     ax_rounds.set_xlabel("Payload Size Range")
@@ -147,9 +137,34 @@ def grouped_bar(
     save(fig, out_dir / filename)
 
 
+def weighted_method_metrics(rows: list[dict[str, str]]) -> dict[str, dict[str, float]]:
+    metrics = [
+        "avalanche_percent",
+        "key_avalanche_percent",
+        "entropy_bits_per_byte",
+        "plaintext_ciphertext_correlation",
+    ]
+    by_mode: dict[str, list[dict[str, str]]] = {mode: [] for mode in MODE_ORDER}
+    for row in rows:
+        by_mode[row["mode"]].append(row)
+
+    weighted = {}
+    for mode, mode_rows in by_mode.items():
+        total = sum(int(float(row["payload_count"])) for row in mode_rows)
+        weighted[mode] = {
+            metric: sum(
+                int(float(row["payload_count"])) * float(row[metric])
+                for row in mode_rows
+            )
+            / total
+            for metric in metrics
+        }
+    return weighted
+
+
 def graph5_security_metrics(rows: list[dict[str, str]], out_dir: Path) -> None:
-    by_round = {int(float(row["rounds"])): row for row in rows}
-    x = SECURITY_ROUNDS
+    by_mode = weighted_method_metrics(rows)
+    x = list(range(len(MODE_ORDER)))
     metrics = [
         ("avalanche_percent", "Avalanche Effect (%)", "Avalanche Effect", 50.0),
         ("key_avalanche_percent", "Key Avalanche Effect (%)", "Key Avalanche Effect", 50.0),
@@ -159,31 +174,31 @@ def graph5_security_metrics(rows: list[dict[str, str]], out_dir: Path) -> None:
 
     fig, axes = plt.subplots(2, 2, figsize=(9.5, 6.8))
     for ax, (column, ylabel, title, reference) in zip(axes.flat, metrics):
-        values = [float(by_round[rounds][column]) for rounds in x]
-        ax.plot(x, values, marker="o", linewidth=2)
+        values = [by_mode[mode][column] for mode in MODE_ORDER]
+        for index, (mode, value) in enumerate(zip(MODE_ORDER, values)):
+            ax.bar(index, value, width=0.55, label=MODE_LABELS[mode])
         if reference is not None:
             ax.axhline(reference, linestyle="--", linewidth=1)
         ax.set_xticks(x)
-        ax.set_xlabel("AES Rounds")
+        ax.set_xticklabels([MODE_LABELS[mode] for mode in MODE_ORDER], rotation=15, ha="right")
+        ax.set_xlabel("Method")
         ax.set_ylabel(ylabel)
         ax.set_title(title)
         style_axes(ax)
 
-    fig.suptitle("Security Characteristics Across AES Round Counts", fontsize=13)
+    fig.suptitle("Security Characteristics Across AES Methods", fontsize=13)
     save(fig, out_dir / "graph5_security_metrics_vs_rounds.png")
 
 
-def print_validation(performance_path: Path, security_path: Path) -> None:
+def print_validation(performance_path: Path) -> None:
     print("Found performance result:")
     print(f"    {performance_path}")
-    print("Found security result:")
-    print(f"    {security_path}")
     print("Using performance columns:")
     print("    payload_bucket, mode, payload_count, rounds_used")
     print("    mean_encryption_time_ns, mean_decryption_time_ns")
     print("    time_reduction_percent_vs_aes10")
-    print("Using security columns:")
-    print("    rounds, avalanche_percent, key_avalanche_percent")
+    print("Using security/statistical columns from the same file:")
+    print("    avalanche_percent, key_avalanche_percent")
     print("    entropy_bits_per_byte, plaintext_ciphertext_correlation")
 
 
@@ -199,7 +214,6 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     performance_rows = read_csv(performance_path)
-    security_rows = read_csv(security_path)
     performance_columns = [
         "payload_bucket",
         "mode",
@@ -208,19 +222,14 @@ def main() -> None:
         "mean_encryption_time_ns",
         "mean_decryption_time_ns",
         "time_reduction_percent_vs_aes10",
-    ]
-    security_columns = [
-        "rounds",
         "avalanche_percent",
         "key_avalanche_percent",
         "entropy_bits_per_byte",
         "plaintext_ciphertext_correlation",
     ]
     require_columns(performance_rows, performance_columns, performance_path)
-    require_columns(security_rows, security_columns, security_path)
     validate_performance(performance_rows)
-    validate_security(security_rows)
-    print_validation(performance_path, security_path)
+    print_validation(performance_path)
 
     graph1_payload_round_selection(performance_rows, out_dir)
     grouped_bar(
@@ -246,11 +255,11 @@ def main() -> None:
         out_dir,
         column="time_reduction_percent_vs_aes10",
         ylabel="Encryption Time Reduction vs AES-10 (%)",
-        title="Encryption Time Reduction Relative to Standard AES-10",
+        title="AdaptAES Encryption Time Reduction Relative to Standard AES-10",
         filename="graph4_encryption_reduction.png",
-        modes=["fixed_reduced_aes_4", "adaptaes"],
+        modes=["adaptaes"],
     )
-    graph5_security_metrics(security_rows, out_dir)
+    graph5_security_metrics(performance_rows, out_dir)
 
 
 if __name__ == "__main__":
