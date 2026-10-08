@@ -1,0 +1,26 @@
+{
+  "pcap": "/home/ayati/Documents/Github Repos/AdaptAES/data/raw/Tuesday_2021-03-30.anonymized.pcap",
+  "total_packets": 651203,
+  "parsed_tcp_udp_ipv4_packets": 650702,
+  "packets_with_payload": 324445,
+  "truncated_packets": 339372,
+  "payload_min": 1,
+  "payload_average": 1868.5236819799966,
+  "payload_max": 65228,
+  "payload_bins": {
+    "1-128": 66173,
+    "129-512": 34043,
+    "513-1024": 17084,
+    ">1024": 207145
+  },
+  "protocol_counts": {
+    "TCP": 623118,
+    "UDP": 27584
+  },
+  "adaptaes_round_counts": {
+    "4": 66173,
+    "6": 34043,
+    "8": 17084,
+    "10": 207145
+  }
+}

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+
+# Keep raw traffic captures local. PCAP files are large dataset artifacts.
+data/raw/
+*.pcap
+*.pcapng
+
+# Local environments and editor state.
+.venv/
+venv/
+.env
+.idea/
+.vscode/
