@@ -1,0 +1,14 @@
+{
+  "dataset_name": "Wednesday_2021-04-07_anonymized",
+  "source_csv": "results/extracted/Wednesday_2021-04-07_anonymized_payload_lengths.csv",
+  "payload_bin": "results/payloads/Wednesday_2021-04-07_anonymized_payloads.bin",
+  "metadata_csv": "results/payloads/Wednesday_2021-04-07_anonymized_payload_manifest.csv",
+  "sample_size_requested": 5000,
+  "payload_count": 5000,
+  "total_payload_bytes": 8414275,
+  "payload_min": 6,
+  "payload_average": 1682.855,
+  "payload_max": 28560,
+  "seed": 42,
+  "sha256_all_payload_bytes": "66bd689e996e6418a11630ea2f7fd8ede3105df2d4cb1c9675f35f8e3e89fe3c"
+}

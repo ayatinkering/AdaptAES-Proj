@@ -12,3 +12,9 @@ venv/
 .env
 .idea/
 .vscode/
+
+# Generated plaintext payload blobs can become large. Regenerate from CSVs.
+results/payloads/*.bin
+
+# Contains PCAP-derived addresses, timestamps, and ports. Keep local.
+results/payloads/*_payload_manifest.csv
