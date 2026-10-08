@@ -1,0 +1,163 @@
+{
+  "dataset_name": "Monday_2021-03-29_anonymized",
+  "payload_records": 10,
+  "security_rows": 30,
+  "metrics_csv": "results/security/Monday_2021-03-29_anonymized_security_metrics.csv",
+  "mode_summary": [
+    {
+      "mode": "adaptaes",
+      "sample_count": 10,
+      "mean_payload_length": 870.5,
+      "mean_rounds_used": 7.2,
+      "mean_plaintext_avalanche_percent": 49.296875,
+      "mean_key_avalanche_percent": 50.9375,
+      "mean_ciphertext_entropy": 7.1017036231461415,
+      "mean_byte_frequency_stddev": 1.5992564295744593,
+      "mean_chi_square": 259.02600961879654,
+      "mean_correlation_coefficient": 0.01095023551586306
+    },
+    {
+      "mode": "fixed_reduced_aes_4",
+      "sample_count": 10,
+      "mean_payload_length": 870.5,
+      "mean_rounds_used": 4.0,
+      "mean_plaintext_avalanche_percent": 49.0625,
+      "mean_key_avalanche_percent": 50.703125,
+      "mean_ciphertext_entropy": 7.106696410541629,
+      "mean_byte_frequency_stddev": 1.5957664445430748,
+      "mean_chi_square": 254.7633782610832,
+      "mean_correlation_coefficient": 0.01217818553338823
+    },
+    {
+      "mode": "standard_aes_10",
+      "sample_count": 10,
+      "mean_payload_length": 870.5,
+      "mean_rounds_used": 10.0,
+      "mean_plaintext_avalanche_percent": 51.171875,
+      "mean_key_avalanche_percent": 49.21875,
+      "mean_ciphertext_entropy": 7.117957246266037,
+      "mean_byte_frequency_stddev": 1.5923276265259891,
+      "mean_chi_square": 254.95234994513686,
+      "mean_correlation_coefficient": -0.002013644284972991
+    }
+  ],
+  "bucket_summary": [
+    {
+      "payload_bucket": "1-128",
+      "mode": "adaptaes",
+      "sample_count": 4,
+      "mean_payload_length": 76.5,
+      "mean_rounds_used": 4.0,
+      "mean_plaintext_avalanche_percent": 47.8515625,
+      "mean_key_avalanche_percent": 52.5390625,
+      "mean_ciphertext_entropy": 6.061838194318828,
+      "mean_byte_frequency_stddev": 0.5670129809812334,
+      "mean_chi_square": 249.26666666666668,
+      "mean_correlation_coefficient": 0.0057471728676871826
+    },
+    {
+      "payload_bucket": "1-128",
+      "mode": "fixed_reduced_aes_4",
+      "sample_count": 4,
+      "mean_payload_length": 76.5,
+      "mean_rounds_used": 4.0,
+      "mean_plaintext_avalanche_percent": 47.8515625,
+      "mean_key_avalanche_percent": 52.5390625,
+      "mean_ciphertext_entropy": 6.061838194318828,
+      "mean_byte_frequency_stddev": 0.5670129809812334,
+      "mean_chi_square": 249.26666666666668,
+      "mean_correlation_coefficient": 0.0057471728676871826
+    },
+    {
+      "payload_bucket": "1-128",
+      "mode": "standard_aes_10",
+      "sample_count": 4,
+      "mean_payload_length": 76.5,
+      "mean_rounds_used": 10.0,
+      "mean_plaintext_avalanche_percent": 49.8046875,
+      "mean_key_avalanche_percent": 52.34375,
+      "mean_ciphertext_entropy": 6.1008243270975235,
+      "mean_byte_frequency_stddev": 0.5642106074482751,
+      "mean_chi_square": 244.26666666666668,
+      "mean_correlation_coefficient": -0.0037537984885786862
+    },
+    {
+      "payload_bucket": "513-1024",
+      "mode": "adaptaes",
+      "sample_count": 2,
+      "mean_payload_length": 567.5,
+      "mean_rounds_used": 8.0,
+      "mean_plaintext_avalanche_percent": 46.09375,
+      "mean_key_avalanche_percent": 55.078125,
+      "mean_ciphertext_entropy": 7.624377797336363,
+      "mean_byte_frequency_stddev": 1.5077471865455652,
+      "mean_chi_square": 260.13986013986016,
+      "mean_correlation_coefficient": -0.0030442955751397403
+    },
+    {
+      "payload_bucket": "513-1024",
+      "mode": "fixed_reduced_aes_4",
+      "sample_count": 2,
+      "mean_payload_length": 567.5,
+      "mean_rounds_used": 4.0,
+      "mean_plaintext_avalanche_percent": 50.390625,
+      "mean_key_avalanche_percent": 46.484375,
+      "mean_ciphertext_entropy": 7.640047964487703,
+      "mean_byte_frequency_stddev": 1.4972972092748749,
+      "mean_chi_square": 255.21678321678323,
+      "mean_correlation_coefficient": 0.0400084679796874
+    },
+    {
+      "payload_bucket": "513-1024",
+      "mode": "standard_aes_10",
+      "sample_count": 2,
+      "mean_payload_length": 567.5,
+      "mean_rounds_used": 10.0,
+      "mean_plaintext_avalanche_percent": 51.5625,
+      "mean_key_avalanche_percent": 46.875,
+      "mean_ciphertext_entropy": 7.627673647378449,
+      "mean_byte_frequency_stddev": 1.4787079183691314,
+      "mean_chi_square": 249.77156177156178,
+      "mean_correlation_coefficient": -0.04886175186678826
+    },
+    {
+      "payload_bucket": ">1024",
+      "mode": "adaptaes",
+      "sample_count": 4,
+      "mean_payload_length": 1816.0,
+      "mean_rounds_used": 10.0,
+      "mean_plaintext_avalanche_percent": 52.34375,
+      "mean_key_avalanche_percent": 47.265625,
+      "mean_ciphertext_entropy": 7.880231964878346,
+      "mean_byte_frequency_stddev": 2.677254499682132,
+      "mean_chi_square": 268.2284273103945,
+      "mean_correlation_coefficient": 0.02315056370954034
+    },
+    {
+      "payload_bucket": ">1024",
+      "mode": "fixed_reduced_aes_4",
+      "sample_count": 4,
+      "mean_payload_length": 1816.0,
+      "mean_rounds_used": 4.0,
+      "mean_plaintext_avalanche_percent": 49.609375,
+      "mean_key_avalanche_percent": 50.9765625,
+      "mean_ciphertext_entropy": 7.8848788497913915,
+      "mean_byte_frequency_stddev": 2.6737545257390165,
+      "mean_chi_square": 260.03338737764966,
+      "mean_correlation_coefficient": 0.0046940569759396965
+    },
+    {
+      "payload_bucket": ">1024",
+      "mode": "standard_aes_10",
+      "sample_count": 4,
+      "mean_payload_length": 1816.0,
+      "mean_rounds_used": 10.0,
+      "mean_plaintext_avalanche_percent": 52.34375,
+      "mean_key_avalanche_percent": 47.265625,
+      "mean_ciphertext_entropy": 7.880231964878346,
+      "mean_byte_frequency_stddev": 2.677254499682132,
+      "mean_chi_square": 268.2284273103945,
+      "mean_correlation_coefficient": 0.02315056370954034
+    }
+  ]
+}
