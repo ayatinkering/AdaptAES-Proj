@@ -1,0 +1,51 @@
+{
+  "python": "3.14.8",
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "cryptography": "50.0.2",
+  "seed": 42,
+  "limit_per_capture": 5000,
+  "repeats": 11,
+  "policy": {
+    "max_delay_ns": 1000000,
+    "max_packets": 8,
+    "max_bytes": 16384,
+    "small_bytes": 512
+  },
+  "sources": [
+    {
+      "dataset": "Monday_2021-03-29_anonymized",
+      "source_sha256": "65268e170f79d682768bc3139e0bd5d4795b6c277f8cb6493f58705531410502",
+      "payload_sha256": "e5c2f64caad59f4c256316a2a7465a91730f7ab58a2eba82173c5fce6f51a462"
+    },
+    {
+      "dataset": "Saturday_2021-04-10_1628_anonymized",
+      "source_sha256": "0fac8915070618416e018979b64a1ead9852f16049526637407967cf9d5fbd2c",
+      "payload_sha256": "6c2f8dc481f514ad061af772d41cd76a3a58d3d05221068932d29680699b3193"
+    },
+    {
+      "dataset": "Saturday_2021-05-01_0520_anonymized",
+      "source_sha256": "bd61eb095eb4670a015a656377d3a4e722cb3f5df51df3c639fcd8ffe58e0e95",
+      "payload_sha256": "d9c3e30dd80a40ef5f41b28d72ac7212f8b8ec712c7fedd1cc37309adb202256"
+    },
+    {
+      "dataset": "Sunday_2021-03-28_anonymized",
+      "source_sha256": "030cf0a8d01ebb319712248029a035d8ca77ed8d10eae62e651967ee35dbd890",
+      "payload_sha256": "b42dad5db640907e9c5ccfc3647fa9f60669099bc1b4488fe9b6bf59d3dd13b3"
+    },
+    {
+      "dataset": "Tuesday_2021-03-30_anonymized",
+      "source_sha256": "bbc615220a9f3ed31282e13c3f2612af2ae8f21f50b3c37fd413e8311addef05",
+      "payload_sha256": "62f38a8b7b411a441a471e8f091f5ac81a5260f03ae7eac9a02a6b7ae0d9b48d"
+    },
+    {
+      "dataset": "Wednesday_2021-04-07_anonymized",
+      "source_sha256": "446517ceb21afa7f749a19a348b148ac0fac73d12d93bfa9f33134488dbda9ee",
+      "payload_sha256": "fed86292e87e703350e28f55de5be1646336272968ed9f4e9fb040d2becda1fa"
+    }
+  ],
+  "timing": "Per-workload median after one warm-up; mode order rotates. Framing and scheduling included; key generation and correctness checks excluded.",
+  "queueing": "Simulated trace-time waiting only. Does not model CPU backlog, transport, or end-to-end latency.",
+  "wire": "Record header, encrypted length prefixes, payloads and full 16-byte authentication tags; excludes transport headers.",
+  "session": "Fresh random AES-128 key per trial; monotonic 96-bit record nonces; full-round AES-GCM in every mode.",
+  "synthetic": "1024 64-byte messages in one flow, spaced 10 us for burst or 5 ms for sparse."
+}

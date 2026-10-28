@@ -1,5 +1,7 @@
 # AdaptAES: Packet-Size Adaptive Round Reduction for AES
 
+> Archived reduced-round experiment. These configurations are insecure comparisons; favorable statistical scores do not establish security. The current research uses full-round AES-GCM aggregation. See the [professor guide](professor_guide.md).
+
 ## 1. Project Overview
 
 **AdaptAES** is an information security lab project that evaluates whether AES encryption time can be reduced for network-traffic payloads by dynamically selecting the number of AES rounds according to packet payload size.

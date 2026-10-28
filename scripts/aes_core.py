@@ -1,4 +1,4 @@
-# aes_core.py
+"""Educational AES primitive and unauthenticated independent-block message helpers."""
 
 S_BOX = [
     0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
@@ -98,35 +98,39 @@ def gmul(a, b):
     return result
 
 
+# Fixed field products avoid repeating eight-step multiplication in every round.
+GF_MUL = {factor: tuple(gmul(value, factor) for value in range(256))
+          for factor in (2, 3, 9, 11, 13, 14)}
+
 def mix_single_column(column):
     a = column[:]
 
     column[0] = (
-        gmul(a[0], 2) ^
-        gmul(a[1], 3) ^
+        GF_MUL[2][a[0]] ^
+        GF_MUL[3][a[1]] ^
         a[2] ^
         a[3]
     )
 
     column[1] = (
         a[0] ^
-        gmul(a[1], 2) ^
-        gmul(a[2], 3) ^
+        GF_MUL[2][a[1]] ^
+        GF_MUL[3][a[2]] ^
         a[3]
     )
 
     column[2] = (
         a[0] ^
         a[1] ^
-        gmul(a[2], 2) ^
-        gmul(a[3], 3)
+        GF_MUL[2][a[2]] ^
+        GF_MUL[3][a[3]]
     )
 
     column[3] = (
-        gmul(a[0], 3) ^
+        GF_MUL[3][a[0]] ^
         a[1] ^
         a[2] ^
-        gmul(a[3], 2)
+        GF_MUL[2][a[3]]
     )
 
     return column
@@ -161,31 +165,31 @@ def inv_mix_columns(state):
         a3 = state[4 * c + 3]
 
         result[4 * c] = (
-            gmul(a0, 14) ^
-            gmul(a1, 11) ^
-            gmul(a2, 13) ^
-            gmul(a3, 9)
+            GF_MUL[14][a0] ^
+            GF_MUL[11][a1] ^
+            GF_MUL[13][a2] ^
+            GF_MUL[9][a3]
         )
 
         result[4 * c + 1] = (
-            gmul(a0, 9) ^
-            gmul(a1, 14) ^
-            gmul(a2, 11) ^
-            gmul(a3, 13)
+            GF_MUL[9][a0] ^
+            GF_MUL[14][a1] ^
+            GF_MUL[11][a2] ^
+            GF_MUL[13][a3]
         )
 
         result[4 * c + 2] = (
-            gmul(a0, 13) ^
-            gmul(a1, 9) ^
-            gmul(a2, 14) ^
-            gmul(a3, 11)
+            GF_MUL[13][a0] ^
+            GF_MUL[9][a1] ^
+            GF_MUL[14][a2] ^
+            GF_MUL[11][a3]
         )
 
         result[4 * c + 3] = (
-            gmul(a0, 11) ^
-            gmul(a1, 13) ^
-            gmul(a2, 9) ^
-            gmul(a3, 14)
+            GF_MUL[11][a0] ^
+            GF_MUL[13][a1] ^
+            GF_MUL[9][a2] ^
+            GF_MUL[14][a3]
         )
 
     return result
@@ -258,8 +262,10 @@ def encrypt_block(block, key, rounds=10):
     if rounds < 1 or rounds > 10:
         raise ValueError("Rounds must be between 1 and 10.")
 
-    round_keys = expand_key(key)
+    return _encrypt_block(block, expand_key(key), rounds)
 
+
+def _encrypt_block(block, round_keys, rounds):
     state = list(block)
 
     # Initial AddRoundKey
@@ -294,8 +300,10 @@ def decrypt_block(block, key, rounds=10):
     if rounds < 1 or rounds > 10:
         raise ValueError("Rounds must be between 1 and 10.")
 
-    round_keys = expand_key(key)
+    return _decrypt_block(block, expand_key(key), rounds)
 
+
+def _decrypt_block(block, round_keys, rounds):
     state = list(block)
 
     # Undo final round
@@ -347,7 +355,10 @@ def unpad_data(data):
 # ARBITRARY-LENGTH DATA
 # -----------------------------
 
-def encrypt_data(data, key):
+def encrypt_data(data, key, rounds=10):
+    if not 1 <= rounds <= 10:
+        raise ValueError("Rounds must be between 1 and 10.")
+    round_keys = expand_key(key)
     padded_data = pad_data(data)
 
     ciphertext = bytearray()
@@ -355,10 +366,10 @@ def encrypt_data(data, key):
     for i in range(0, len(padded_data), 16):
         block = padded_data[i:i + 16]
 
-        encrypted_block = encrypt_block(
+        encrypted_block = _encrypt_block(
             block,
-            key,
-            rounds=10
+            round_keys,
+            rounds
         )
 
         ciphertext.extend(encrypted_block)
@@ -366,7 +377,10 @@ def encrypt_data(data, key):
     return bytes(ciphertext)
 
 
-def decrypt_data(ciphertext, key):
+def decrypt_data(ciphertext, key, rounds=10):
+    if not 1 <= rounds <= 10:
+        raise ValueError("Rounds must be between 1 and 10.")
+    round_keys = expand_key(key)
     if len(ciphertext) % 16 != 0:
         raise ValueError("Ciphertext length must be a multiple of 16.")
 
@@ -375,10 +389,10 @@ def decrypt_data(ciphertext, key):
     for i in range(0, len(ciphertext), 16):
         block = ciphertext[i:i + 16]
 
-        decrypted_block = decrypt_block(
+        decrypted_block = _decrypt_block(
             block,
-            key,
-            rounds=10
+            round_keys,
+            rounds
         )
 
         plaintext.extend(decrypted_block)

@@ -1,0 +1,38 @@
+{
+  "dataset_name": "Monday_2021-03-29_anonymized",
+  "repeats": 5,
+  "payload_records": 50,
+  "timing_rows": 150,
+  "manifest": "results/payloads/Monday_2021-03-29_anonymized_payload_manifest.csv",
+  "payload_bin": "results/payloads/Monday_2021-03-29_anonymized_payloads.bin",
+  "timings_csv": "results/classroom/timings/Monday_2021-03-29_anonymized_timings.csv",
+  "modes": {
+    "standard_aes_10": {
+      "payload_count": 50,
+      "mean_encryption_time_ns": 8457230.06,
+      "median_encryption_time_ns": 5426278.0,
+      "mean_decryption_time_ns": 7552169.3,
+      "median_decryption_time_ns": 4337831.5,
+      "mean_throughput_mb_s": 0.26999043976899584,
+      "mean_rounds_used": 10.0
+    },
+    "fixed_reduced_aes_4": {
+      "payload_count": 50,
+      "mean_encryption_time_ns": 3395519.54,
+      "median_encryption_time_ns": 1972837.0,
+      "mean_decryption_time_ns": 3034503.54,
+      "median_decryption_time_ns": 1792956.0,
+      "mean_throughput_mb_s": 0.6765080262625353,
+      "mean_rounds_used": 4.0
+    },
+    "adaptaes": {
+      "payload_count": 50,
+      "mean_encryption_time_ns": 8611178.7,
+      "median_encryption_time_ns": 5052985.5,
+      "mean_decryption_time_ns": 7503058.96,
+      "median_decryption_time_ns": 4343177.0,
+      "mean_throughput_mb_s": 0.35153702048518815,
+      "mean_rounds_used": 8.12
+    }
+  }
+}

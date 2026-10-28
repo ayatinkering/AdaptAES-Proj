@@ -106,7 +106,13 @@ def read_timings(path: Path) -> dict[tuple[str, int, str], dict[str, float]]:
 
 def summarize(rows: list[dict[str, object]], timings: dict[tuple[str, int, str], dict[str, float]],
               max_payloads: int | None) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    selected = rows if max_payloads is None else rows[:max_payloads]
+    selected = []
+    counts = Counter()
+    for row in rows:
+        name = row["dataset_name"]
+        if max_payloads is None or counts[name] < max_payloads:
+            selected.append(row)
+            counts[name] += 1
     security = []
     performance: dict[tuple[str, str], list[dict[str, float]]] = defaultdict(list)
     mode_rounds = {"standard_aes_10": 10, "fixed_reduced_aes_4": 4}
@@ -115,8 +121,9 @@ def summarize(rows: list[dict[str, object]], timings: dict[tuple[str, int, str],
         group = bucket(size)
         chosen = 4 if size <= 128 else 6 if size <= 512 else 8 if size <= 1024 else 10
         round_for_mode = {**mode_rounds, "adaptaes": chosen}
+        round_metrics = {rounds: metrics(payload, rounds) for rounds in set(round_for_mode.values())}
         for mode, rounds in round_for_mode.items():
-            sec = metrics(payload, rounds)
+            sec = round_metrics[rounds]
             security.append({"dataset_name": item["dataset_name"], "payload_id": pid,
                              "payload_length": size, "payload_bucket": group,
                              "mode": mode, "rounds": rounds, **sec})

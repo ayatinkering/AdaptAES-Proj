@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import platform
 import statistics
 import time
 from collections import defaultdict
@@ -23,7 +24,6 @@ from pathlib import Path
 from aes_adaptive import adaptaes_decrypt, adaptaes_encrypt
 from aes_core import decrypt_data, encrypt_data
 from aes_reduced import reduced_aes_decrypt, reduced_aes_encrypt
-
 
 KEY = bytes.fromhex("000102030405060708090a0b0c0d0e0f")
 
@@ -69,76 +69,41 @@ def payload_bucket(payload_length: int) -> str:
     return ">1024"
 
 
-def benchmark_payload(payload: bytes, payload_length: int) -> list[dict[str, object]]:
-    results: list[dict[str, object]] = []
-
-    start = time.perf_counter_ns()
-    standard_ciphertext = encrypt_data(payload, KEY)
-    standard_enc_ns = time.perf_counter_ns() - start
-
-    start = time.perf_counter_ns()
-    standard_plaintext = decrypt_data(standard_ciphertext, KEY)
-    standard_dec_ns = time.perf_counter_ns() - start
-    if standard_plaintext != payload:
-        raise ValueError("standard AES decrypt mismatch")
-
-    results.append(
-        {
-            "mode": "standard_aes_10",
-            "rounds_used": 10,
-            "encryption_time_ns": standard_enc_ns,
-            "decryption_time_ns": standard_dec_ns,
-            "throughput_mb_s": throughput_mb_s(payload_length, standard_enc_ns),
-        }
-    )
-
-    start = time.perf_counter_ns()
-    reduced_ciphertext = reduced_aes_encrypt(payload, KEY)
-    reduced_enc_ns = time.perf_counter_ns() - start
-
-    start = time.perf_counter_ns()
-    reduced_plaintext = reduced_aes_decrypt(reduced_ciphertext, KEY)
-    reduced_dec_ns = time.perf_counter_ns() - start
-    if reduced_plaintext != payload:
-        raise ValueError("reduced AES decrypt mismatch")
-
-    results.append(
-        {
-            "mode": "fixed_reduced_aes_4",
-            "rounds_used": 4,
-            "encryption_time_ns": reduced_enc_ns,
-            "decryption_time_ns": reduced_dec_ns,
-            "throughput_mb_s": throughput_mb_s(payload_length, reduced_enc_ns),
-        }
-    )
-
-    start = time.perf_counter_ns()
-    adaptive_ciphertext, adaptive_rounds = adaptaes_encrypt(payload, KEY)
-    adaptive_enc_ns = time.perf_counter_ns() - start
-
-    start = time.perf_counter_ns()
-    adaptive_plaintext, decrypt_rounds = adaptaes_decrypt(
-        adaptive_ciphertext,
-        KEY,
-        payload_length,
-    )
-    adaptive_dec_ns = time.perf_counter_ns() - start
-    if adaptive_plaintext != payload:
-        raise ValueError("AdaptAES decrypt mismatch")
-    if adaptive_rounds != decrypt_rounds:
-        raise ValueError("AdaptAES encrypt/decrypt round mismatch")
-
-    results.append(
-        {
-            "mode": "adaptaes",
-            "rounds_used": adaptive_rounds,
-            "encryption_time_ns": adaptive_enc_ns,
-            "decryption_time_ns": adaptive_dec_ns,
-            "throughput_mb_s": throughput_mb_s(payload_length, adaptive_enc_ns),
-        }
-    )
-
-    return results
+def benchmark_payload(payload: bytes, payload_length: int, repeats: int = 5) -> list[dict[str, object]]:
+    if repeats < 1:
+        raise ValueError("Repeats must be positive.")
+    modes = {
+        "standard_aes_10": (lambda: (encrypt_data(payload, KEY), 10),
+                            lambda ct: (decrypt_data(ct, KEY), 10)),
+        "fixed_reduced_aes_4": (lambda: (reduced_aes_encrypt(payload, KEY), 4),
+                                lambda ct: (reduced_aes_decrypt(ct, KEY), 4)),
+        "adaptaes": (lambda: adaptaes_encrypt(payload, KEY),
+                    lambda ct: adaptaes_decrypt(ct, KEY, payload_length)),
+    }
+    measurements = {mode: ([], []) for mode in modes}
+    rounds_used = {}
+    names = list(modes)
+    # One untimed warm-up, then rotate mode order to reduce ordering bias.
+    for repeat in range(repeats + 1):
+        for mode in names[repeat % 3:] + names[:repeat % 3]:
+            encrypt, decrypt = modes[mode]
+            start = time.perf_counter_ns()
+            ciphertext, rounds = encrypt()
+            enc = time.perf_counter_ns() - start
+            start = time.perf_counter_ns()
+            plaintext, decoded_rounds = decrypt(ciphertext)
+            dec = time.perf_counter_ns() - start
+            if plaintext != payload or rounds != decoded_rounds:
+                raise ValueError(f"{mode} decrypt mismatch")
+            rounds_used[mode] = rounds
+            if repeat:
+                measurements[mode][0].append(enc)
+                measurements[mode][1].append(dec)
+    return [{"mode": mode, "rounds_used": rounds_used[mode],
+             "encryption_time_ns": statistics.median(enc),
+             "decryption_time_ns": statistics.median(dec),
+             "throughput_mb_s": throughput_mb_s(payload_length, statistics.median(enc))}
+            for mode, (enc, dec) in measurements.items()]
 
 
 def summarize(rows: list[dict[str, object]]) -> dict[str, object]:
@@ -169,6 +134,7 @@ def benchmark_dataset(
     payload_bin_path: Path,
     out_dir: Path,
     limit: int | None,
+    repeats: int = 5,
 ) -> dict[str, object]:
     dataset_name = manifest_path.name[: -len("_payload_manifest.csv")]
     rows = load_manifest(manifest_path, limit)
@@ -198,7 +164,7 @@ def benchmark_dataset(
         for row in rows:
             payload = read_payload(payload_bin_path, row)
             payload_length = int(row["payload_length"])
-            for result in benchmark_payload(payload, payload_length):
+            for result in benchmark_payload(payload, payload_length, repeats):
                 output_row = {
                     "dataset_name": dataset_name,
                     "payload_id": int(row["payload_id"]),
@@ -211,6 +177,7 @@ def benchmark_dataset(
 
     summary = {
         "dataset_name": dataset_name,
+        "repeats": repeats,
         "payload_records": len(rows),
         "timing_rows": len(output_rows),
         "manifest": str(manifest_path),
@@ -327,7 +294,10 @@ def main() -> None:
         default=100,
         help="Payloads per dataset. Use a small value because pure Python AES is slow.",
     )
+    parser.add_argument("--repeats", type=int, default=5, help="Timed repetitions after one warm-up.")
     args = parser.parse_args()
+    if args.limit < 1 or args.repeats < 1:
+        parser.error("--limit and --repeats must be positive")
 
     summaries = []
     for manifest_path in sorted(args.payload_dir.glob("*_payload_manifest.csv")):
@@ -342,6 +312,7 @@ def main() -> None:
                 payload_bin_path=payload_bin_path,
                 out_dir=args.out_dir,
                 limit=args.limit,
+                repeats=args.repeats,
             )
         )
 
@@ -353,6 +324,9 @@ def main() -> None:
         "payload_dir": str(args.payload_dir),
         "out_dir": str(args.out_dir),
         "payload_limit_per_dataset": args.limit,
+        "repeats": args.repeats,
+        "timing_statistic": "Per-payload median after one warm-up; rotating mode order.",
+        "environment": {"python": platform.python_version(), "platform": platform.platform()},
         "aggregate_modes": combine_mode_summaries(summaries),
         "bucket_summary_csv": str(bucket_summary_csv),
         "bucket_summary": bucket_summary,

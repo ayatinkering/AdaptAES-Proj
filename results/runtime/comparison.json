@@ -1,0 +1,70 @@
+{
+  "baseline_revision": "3ff4a89",
+  "python": "3.14.8",
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "repeats": 21,
+  "statistic": "Interleaved medians after one warm-up; wall and process CPU time.",
+  "workloads": [
+    {
+      "payload_bytes": 128,
+      "before_encryption": {
+        "wall_ms": 2.010852,
+        "cpu_ms": 2.003891
+      },
+      "before_decryption": {
+        "wall_ms": 3.582633,
+        "cpu_ms": 3.583431
+      },
+      "after_encryption": {
+        "wall_ms": 0.369873,
+        "cpu_ms": 0.37008
+      },
+      "after_decryption": {
+        "wall_ms": 0.367322,
+        "cpu_ms": 0.36739
+      }
+    },
+    {
+      "payload_bytes": 512,
+      "before_encryption": {
+        "wall_ms": 7.156075,
+        "cpu_ms": 7.145512
+      },
+      "before_decryption": {
+        "wall_ms": 12.789679,
+        "cpu_ms": 12.790654
+      },
+      "after_encryption": {
+        "wall_ms": 1.259588,
+        "cpu_ms": 1.25875
+      },
+      "after_decryption": {
+        "wall_ms": 1.244268,
+        "cpu_ms": 1.24441
+      }
+    },
+    {
+      "payload_bytes": 1024,
+      "before_encryption": {
+        "wall_ms": 14.093958,
+        "cpu_ms": 14.094383
+      },
+      "before_decryption": {
+        "wall_ms": 25.359218,
+        "cpu_ms": 25.331806
+      },
+      "after_encryption": {
+        "wall_ms": 2.487015,
+        "cpu_ms": 2.487391
+      },
+      "after_decryption": {
+        "wall_ms": 2.428665,
+        "cpu_ms": 2.428751
+      }
+    }
+  ],
+  "python_and_import_wall_ms": {
+    "before": 18.761586,
+    "after": 19.464691
+  }
+}

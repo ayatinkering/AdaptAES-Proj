@@ -1,0 +1,7 @@
+{
+  "seed": 42,
+  "samples": 512,
+  "design": "Identical independent random blocks, keys, and random single-bit flips at each round count.",
+  "confidence_interval": "Mean +/- 1.96 * sample standard deviation / sqrt(samples).",
+  "entropy": "Pooled bytes from all ciphertext blocks, not a mean of 16-byte entropies."
+}

@@ -1,0 +1,11 @@
+[project]
+name = "adaptaes"
+version = "0.1.0"
+description = "A trace-driven college experiment in bounded-delay authenticated aggregation"
+requires-python = ">=3.11"
+dependencies = [
+    "cryptography>=46,<51",
+]
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.10,<4", "pillow>=13"]
