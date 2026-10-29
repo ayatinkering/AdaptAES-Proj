@@ -2598,3 +2598,115 @@ details > summary {
     grid-template-columns: 104px 1fr 66px;
   }
 }
+
+/* Presentation layout: payload first, measured evidence next. */
+body {
+  font-size: 18px;
+}
+.page-heading p {
+  font-size: 18px;
+  max-width: 750px;
+}
+.section-title {
+  font-size: 22px;
+}
+.workbench {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+.automatic-selection {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0;
+  padding: 22px;
+  border-left: 3px solid #93d4ae;
+  background: #101710;
+}
+.automatic-selection span,
+.automatic-selection small {
+  font-size: 15px;
+  color: #b9c8bb;
+}
+.automatic-selection strong {
+  font-size: 26px;
+  color: #93d4ae;
+}
+.manual-mode {
+  margin-bottom: 18px;
+}
+.manual-mode summary,
+.policy-details summary,
+.comparison summary {
+  cursor: pointer;
+  font-size: 15px;
+  color: #bcb5a8;
+  padding: 10px 0;
+}
+.metrics strong {
+  font-size: 32px;
+}
+.hex-output {
+  max-height: 150px;
+  overflow: auto;
+  font-size: 17px;
+}
+.comparison {
+  margin-top: 32px;
+  border-top: 2px solid #93d4ae;
+}
+.comparison .bar-row {
+  min-height: 58px;
+}
+.comparison .chart-caption {
+  font-size: 18px;
+}
+.trace-controls button {
+  min-height: 48px;
+}
+@media (max-width: 900px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+}
+.direct-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: 24px 0 36px;
+  border: 1px solid #383a35;
+}
+.direct-comparison > div {
+  padding: 26px;
+  border-right: 1px solid #383a35;
+}
+.direct-comparison > div:first-child {
+  color: #93d4ae;
+  background: #101710;
+}
+.direct-comparison > div:last-child {
+  border: 0;
+  color: #e9cc7e;
+}
+.direct-comparison span {
+  display: block;
+  font-size: 15px;
+}
+.direct-comparison strong {
+  display: block;
+  font-size: clamp(28px, 3vw, 44px);
+  margin: 14px 0;
+}
+.direct-comparison strong small {
+  font-size: 18px;
+}
+.direct-comparison p {
+  font-size: 14px;
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .direct-comparison {
+    grid-template-columns: 1fr;
+  }
+  .direct-comparison > div {
+    border-right: 0;
+    border-bottom: 1px solid #383a35;
+  }
+}

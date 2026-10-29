@@ -340,12 +340,23 @@ function Workspace({ openSource, onAnalyze }) {
   const [bit, setBit] = useState(0);
   const [comparison, setComparison] = useState(null);
   const [copy, setCopy] = useState("Copy hex");
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    if (!playing || !result) return;
+    if (stage >= result.trace.length - 1) {
+      setPlaying(false);
+      return;
+    }
+    const timer = setTimeout(() => setStage(stage + 1), 650);
+    return () => clearTimeout(timer);
+  }, [playing, result, stage]);
   const bytes =
     tab === "file" ? file?.bytes || new Uint8Array() : encoder.encode(input);
   const size = bytes.length;
   const config = picked(mode, size);
   const fileRef = useRef();
   function invalidate() {
+    setPlaying(false);
     setResult(null);
     setComparison(null);
     setError("");
@@ -385,7 +396,9 @@ function Workspace({ openSource, onAnalyze }) {
       if (compare) setComparison(await api("compare", body));
       else {
         const r = await api("encrypt", body);
+        setPlaying(false);
         setResult(r);
+        if (size <= 4096) setComparison(await api("compare", body));
         setStage(
           r.trace.findIndex((s) => s.name.startsWith("ARX")) >= 0
             ? r.trace.findIndex((s) => s.name.startsWith("ARX"))
@@ -398,6 +411,12 @@ function Workspace({ openSource, onAnalyze }) {
       setBusy(false);
     }
   }
+  const adaptiveTiming = comparison?.rows.find(
+    (row) => row.design === "AdaptAES–ARX",
+  );
+  const standardTiming = comparison?.rows.find(
+    (row) => row.design === "AES-10",
+  );
   const current = result?.trace[stage],
     before = result?.trace[Math.max(0, stage - 1)];
   return (
@@ -405,11 +424,10 @@ function Workspace({ openSource, onAnalyze }) {
       <div className="page-heading">
         <div>
           <h1>
-            Cipher workbench<span className="title-dot">.</span>
+            Encryption lab<span className="title-dot">.</span>
           </h1>
           <p>
-            Enter a message, encrypt it, and follow the transformations inside
-            each block.
+            Your payload. Automatic round selection. A measured AES comparison.
           </p>
         </div>
         <button
@@ -419,7 +437,7 @@ function Workspace({ openSource, onAnalyze }) {
           Read the cipher <span>↗</span>
         </button>
       </div>
-      <DemoGuide />
+
       <div className="workbench">
         <section className="input-pane">
           <SectionTitle number="01">
@@ -557,16 +575,31 @@ function Workspace({ openSource, onAnalyze }) {
               ))}
             </div>
           </div>
-          <label className="field-label" htmlFor="mode">
-            Encryption configuration
-          </label>
-          <select id="mode" value={mode} onChange={changeMode}>
-            {MODES.map(([v, label]) => (
-              <option value={v} key={v}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <div className="automatic-selection">
+            <span>
+              {mode.startsWith("adaptive")
+                ? "Automatic selection"
+                : "Fixed reference"}
+            </span>
+            <strong>{config.label}</strong>
+            <small>
+              {number(size, 0)} bytes → {config.rounds} rounds
+              {config.arx ? " + ARX" : ""}
+            </small>
+          </div>
+          <details className="manual-mode">
+            <summary>Change reference method</summary>
+            <label className="field-label" htmlFor="mode">
+              Encryption configuration
+            </label>
+            <select id="mode" value={mode} onChange={changeMode}>
+              {MODES.map(([v, label]) => (
+                <option value={v} key={v}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </details>
           <details className="key-details">
             <summary>
               128-bit key <span>{key.slice(0, 8)}…</span>
@@ -603,7 +636,11 @@ function Workspace({ openSource, onAnalyze }) {
               disabled={busy || size === 0 || size > 65536}
               onClick={() => run()}
             >
-              {busy ? "Processing…" : "Encrypt & inspect"}
+              {busy
+                ? "Processing…"
+                : size <= 4096
+                  ? "Encrypt & compare"
+                  : "Encrypt & inspect"}
               <span>↗</span>
             </button>
             <button
@@ -644,17 +681,20 @@ function Workspace({ openSource, onAnalyze }) {
             </span>
           </div>
           <CipherPath config={config} />
-          <p className="policy-note">
-            {mode === "adaptive_arx"
-              ? config.arx
-                ? "ARX mixing runs after round 2. Larger payloads retain the original 6/8/10-round policy."
-                : "This size uses the original AES path. ARX is applied only to payloads up to 128 bytes."
-              : mode === "hybrid"
-                ? "Fixed four-round AES with the exact ARX transformation from the supplied prototype."
-                : mode === "adaptive"
-                  ? "The original payload-size policy selects 4, 6, 8 or 10 AES rounds."
-                  : "Fixed-round reference using the supplied Python AES core."}
-          </p>
+          <details className="policy-details">
+            <summary>Selection policy</summary>
+            <p className="policy-note">
+              {mode === "adaptive_arx"
+                ? config.arx
+                  ? "ARX mixing runs after round 2. Larger payloads retain the original 6/8/10-round policy."
+                  : "This size uses the original AES path. ARX is applied only to payloads up to 128 bytes."
+                : mode === "hybrid"
+                  ? "Fixed four-round AES with the exact ARX transformation from the supplied prototype."
+                  : mode === "adaptive"
+                    ? "The original payload-size policy selects 4, 6, 8 or 10 AES rounds."
+                    : "Fixed-round reference using the supplied Python AES core."}
+            </p>
+          </details>
           {result ? (
             <>
               <div className="hex-heading">
@@ -706,7 +746,7 @@ function Workspace({ openSource, onAnalyze }) {
                 </div>
               </div>
               <p className="measurement">
-                Single run. Trace collection excluded from timings.
+                Single encryption run · visual replay excluded.
               </p>
               <div className="verification">
                 <span>✓ Exact plaintext recovered</span>
@@ -775,19 +815,52 @@ function Workspace({ openSource, onAnalyze }) {
               </button>
             }
           >
-            Compare encryption performance
+            AdaptAES vs standard AES
           </SectionTitle>
           <p className="muted">
             {comparison.bytes} bytes · median of five timed runs · same input
             and key
           </p>
+          <div className="direct-comparison">
+            <div>
+              <span>AdaptAES · automatic</span>
+              <strong>
+                {number(adaptiveTiming.median_ms)} <small>ms</small>
+              </strong>
+              <p>{number(adaptiveTiming.throughput_mib_s)} MiB/s</p>
+            </div>
+            <div>
+              <span>Standard AES · 10 rounds</span>
+              <strong>
+                {number(standardTiming.median_ms)} <small>ms</small>
+              </strong>
+              <p>{number(standardTiming.throughput_mib_s)} MiB/s</p>
+            </div>
+            <div>
+              <span>Measured speed ratio</span>
+              <strong>
+                {number(standardTiming.median_ms / adaptiveTiming.median_ms, 2)}
+                ×
+              </strong>
+              <p>AES-10 time / AdaptAES time</p>
+            </div>
+          </div>
           <Bars
             rows={comparison.rows}
             metric="median_ms"
-            label="Padded-message encryption time"
+            label="Encryption time · lower is faster"
             unit="ms"
           />
-          <DataTable rows={comparison.rows} />
+          <Bars
+            rows={comparison.rows}
+            metric="throughput_mib_s"
+            label="Throughput · higher is faster"
+            unit="MiB/s"
+          />
+          <details>
+            <summary>Measurement details</summary>
+            <DataTable rows={comparison.rows} />
+          </details>
         </section>
       )}
       <section className="inspector">
@@ -850,6 +923,16 @@ function Workspace({ openSource, onAnalyze }) {
             <div className="state-heading">
               <h3>{current?.name || "A state, before and after."}</h3>
               <div className="trace-controls">
+                <button
+                  title="Replay measured intermediate states at a readable pace; this is not encryption duration"
+                  disabled={!result}
+                  onClick={() => {
+                    if (!playing) setStage(0);
+                    setPlaying(!playing);
+                  }}
+                >
+                  {playing ? "Pause" : "Replay encryption"}
+                </button>
                 <button
                   aria-label="Previous operation"
                   disabled={!result || stage === 0}
