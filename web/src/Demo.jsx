@@ -26,20 +26,68 @@ const chosen = (n) =>
         : "AES-10";
 const colour = (n) =>
   /ARX/.test(n)
-    ? "#56e596"
+    ? "#087a48"
     : n === "AES-10"
-      ? "#66b8ff"
+      ? "#1d63c9"
       : n === "AES-4"
-        ? "#ff7979"
+        ? "#c43232"
         : n === "AES-5"
-          ? "#ffe265"
-          : "#bfc9d4";
+          ? "#946400"
+          : "#52657e";
 const encode = (bytes) => {
   let s = "";
   for (const b of bytes) s += String.fromCharCode(b);
   return btoa(s);
 };
 const short = (n) => n.replace("Original AdaptAES", "AdaptAES (original)");
+function MessageFlow({ size }) {
+  const rounds = size <= 128 ? 4 : size <= 512 ? 6 : size <= 1024 ? 8 : 10;
+  return (
+    <div className="message-flow" aria-label="Encryption pipeline">
+      <div className="flow-input">
+        <strong>Plaintext</strong>
+        <small>{size} bytes of input</small>
+      </div>
+      <span className="flow-arrow" aria-hidden="true">
+        ↓
+      </span>
+      <div className="flow-key">
+        <strong>Initial key addition</strong>
+        <small>Combine the block with the round key</small>
+      </div>
+      <span className="flow-arrow" aria-hidden="true">
+        ↓
+      </span>
+      <div className="flow-round-grid">
+        {Array.from({ length: rounds }, (_, i) => i + 1).flatMap((n) => [
+          <div className="flow-aes" key={n}>
+            <strong>Round {n}</strong>
+            <small>
+              {n === rounds
+                ? "Substitute · shift · key"
+                : "Substitute · shift · mix · key"}
+            </small>
+          </div>,
+          ...(n === 2 && size <= 128
+            ? [
+                <div key="arx" className="flow-arx">
+                  <strong>ARX mixing × 2</strong>
+                  <small>Add · rotate · XOR</small>
+                </div>,
+              ]
+            : []),
+        ])}
+      </div>
+      <span className="flow-arrow" aria-hidden="true">
+        ↓
+      </span>
+      <div className="flow-output">
+        <strong>Ciphertext</strong>
+        <small>Decrypt and check exact recovery</small>
+      </div>
+    </div>
+  );
+}
 function ErrorText({ value }) {
   return value ? (
     <p className="demo-error" role="alert">
@@ -212,6 +260,10 @@ function Trace({ value }) {
         <span aria-hidden="true">→</span>
         <Matrix stage={current} previous={previous} label="After" />
       </div>
+      <p className="demo-note">
+        Blue is the state before this step; green is the state after it. Yellow
+        cells changed during this transformation.
+      </p>
       {current.words_before && (
         <div className="demo-arx">
           <h3>Two ARX iterations</h3>
@@ -662,15 +714,7 @@ function EncryptionScreen({ catalog, onAttacks }) {
               </div>
             ))}
           </div>
-          <div className="demo-flow">
-            AES 1–2 <span>→</span>{" "}
-            {size <= 128 && (
-              <>
-                ARX <span>→</span>
-              </>
-            )}{" "}
-            AES 3–{size <= 128 ? 4 : size <= 512 ? 6 : size <= 1024 ? 8 : 10}
-          </div>
+          <MessageFlow size={size || 1} />
           <details>
             <summary>Key and inspected cipher</summary>
             <label>
