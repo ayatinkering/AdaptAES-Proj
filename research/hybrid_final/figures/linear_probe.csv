@@ -1,0 +1,6 @@
+design,keys,plaintexts_per_key,max_abs_correlation_mean,max_abs_correlation_seen
+AES-4,4,2048,0.0764,0.085
+AES-4 + ARX,4,2048,0.0833,0.0908
+AES-5,4,2048,0.0837,0.0859
+AES-10,4,2048,0.0762,0.082
+independent random bits,200,2048,0.0798,0.1123

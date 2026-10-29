@@ -1,0 +1,5 @@
+design,trials,substituted_message_accepted,attacker_selected_block_delivered,repeated_blocks_visible
+AES-4,100,100,100,100
+AES-4 + ARX,100,100,100,100
+AES-5,100,100,100,100
+AES-10,100,100,100,100

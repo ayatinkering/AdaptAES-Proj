@@ -1,0 +1,41 @@
+trial,stage,balanced_byte_positions
+0,after AES round 2,16
+0,after ARX,0
+0,after AES round 3,1
+0,ciphertext,0
+1,after AES round 2,16
+1,after ARX,0
+1,after AES round 3,1
+1,ciphertext,0
+2,after AES round 2,16
+2,after ARX,0
+2,after AES round 3,0
+2,ciphertext,1
+3,after AES round 2,16
+3,after ARX,0
+3,after AES round 3,0
+3,ciphertext,1
+4,after AES round 2,16
+4,after ARX,0
+4,after AES round 3,0
+4,ciphertext,0
+5,after AES round 2,16
+5,after ARX,0
+5,after AES round 3,0
+5,ciphertext,0
+6,after AES round 2,16
+6,after ARX,0
+6,after AES round 3,1
+6,ciphertext,0
+7,after AES round 2,16
+7,after ARX,0
+7,after AES round 3,0
+7,ciphertext,0
+8,after AES round 2,16
+8,after ARX,0
+8,after AES round 3,0
+8,ciphertext,0
+9,after AES round 2,16
+9,after ARX,0
+9,after AES round 3,0
+9,ciphertext,0

@@ -1,5 +1,24 @@
 # AdaptAES-Proj
 
+## Interactive cipher workbench
+
+The final teammate research source and results are preserved unchanged in
+`research/hybrid_final/`, with SHA-256 provenance. The new React interface runs
+those ciphers through a local Python adapter and includes state inspection, live
+integral/differential/linear/substitution experiments, and recorded research tables.
+
+```bash
+cd web
+npm install
+npm run build
+cd ..
+python3 -m api.server
+```
+
+Open http://127.0.0.1:8000 . See [workbench instructions](docs/workbench_usage.md).
+
+
+
 **AdaptAES** is an Information Security lab project that evaluates packet-size-adaptive AES round reduction on PCAP-derived network payload sizes.
 
 The project compares three encryption approaches:

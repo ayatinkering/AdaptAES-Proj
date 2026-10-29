@@ -18,3 +18,8 @@ results/payloads/*.bin
 
 # Contains PCAP-derived addresses, timestamps, and ports. Keep local.
 results/payloads/*_payload_manifest.csv
+
+# Local workbench build and runtime
+web/node_modules/
+web/dist/
+.workbench/

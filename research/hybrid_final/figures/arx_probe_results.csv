@@ -1,0 +1,4 @@
+design,keys,chosen_blocks_per_key,master_key_candidate_trials,mean_remaining_byte_guesses,final_remaining_byte_guesses
+AES-4,5,4096,5,16,16
+AES-4 + ARX,5,4096,0,0,0
+AES-5,5,4096,0,0,0

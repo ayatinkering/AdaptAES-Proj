@@ -1,0 +1,6 @@
+design,keys,pairs_per_key,mean_largest_byte_difference_count,largest_byte_difference_count_seen,mean_max_byte_chi_square,mean_max_bit_bias,largest_bit_bias_seen
+AES-4,8,2048,19.5,21,290.72,0.0302,0.0347
+AES-4 + ARX,8,2048,20,22,291.47,0.0304,0.0366
+AES-5,8,2048,19.88,22,300.41,0.033,0.0454
+AES-10,8,2048,19.75,21,300.75,0.0304,0.0454
+random reference (simulation),200,2048,20.14,25,296.75,0.0312,0.0513
