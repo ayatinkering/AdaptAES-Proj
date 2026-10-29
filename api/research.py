@@ -255,13 +255,16 @@ def experiments(kind, seed, trials, emit):
                 successes+=got==a[:16]+b[16:]
                 p=rng.randbytes(16);repeat=seal(p*2)
                 per_trial.append({'source_first_block':a[:16].hex(),'target_first_block':b[:16].hex(),
-                                  'delivered_first_block':got[:16].hex(),'modified_accepted':True,
+                                  'delivered_first_block':got[:16].hex(),'source_ciphertext_block':ca[:16].hex(),
+                                  'target_ciphertext_block':cb[:16].hex(),'modified_ciphertext_block':altered[:16].hex(),'modified_accepted':True,
                                   'repeated_blocks_visible':repeat[:16]==repeat[16:32]})
             elif kind=='differential':
                 n=256;hist=[[0]*256 for _ in range(16)];ones=[0]*128
                 for _ in range(n):
                     p=rng.randbytes(16);q=bytearray(p);q[0]^=1
-                    for j,(x,y) in enumerate(zip(enc(p),enc(bytes(q)))):
+                    left,right=enc(p),enc(bytes(q))
+                    if _==0:per_trial.append({'plaintext':p.hex(),'changed_plaintext':bytes(q).hex(),'ciphertext':left.hex(),'changed_ciphertext':right.hex(),'changed_bits':sum((a^b).bit_count() for a,b in zip(left,right))})
+                    for j,(x,y) in enumerate(zip(left,right)):
                         d=x^y;hist[j][d]+=1
                         for bit in range(8):ones[j*8+bit]+=(d>>bit)&1
                 counts.append(max(max(h) for h in hist));biases.append(max(abs(x/n-.5) for x in ones))
@@ -271,9 +274,11 @@ def experiments(kind, seed, trials, emit):
                 # plaintext byte against all output bits, using bitset parity.
                 for i in range(n):
                     p=rng.randbytes(16);c=enc(p)
+                    if i==0:per_trial.append({'plaintext':p.hex(),'ciphertext':c.hex()})
                     for j in range(16):px[j]|=((p[j]>>7)&1)<<i
                     for j in range(128):cy[j]|=((c[j//8]>>(7-j%8))&1)<<i
-                linear.append(max(abs(1-2*(x^y).bit_count()/n) for x in px for y in cy))
+                best=max(((1-2*(x^y).bit_count()/n,pi,ci) for pi,x in enumerate(px) for ci,y in enumerate(cy)),key=lambda item:abs(item[0]))
+                linear.append(abs(best[0]));per_trial[-1].update(input_bit=best[1]*8,output_bit=best[2],correlation=best[0])
             else: raise ValueError('Unsupported experiment.')
             emit({'completed':len(rows)*trials+trial+1,'total':len(configs)*trials,'design':design})
         entry={'design':design,'rounds':rounds,'arx':arx,'trials':trials}
@@ -281,8 +286,8 @@ def experiments(kind, seed, trials, emit):
                                          queries_per_trial=1024, verified_recoveries=successes if design=='AES-4' else None,
                                          final_candidates=statistics.mean(c[-1] for c in curves), details=per_trial)
         elif kind=='substitution':entry.update(accepted=successes,details=per_trial)
-        elif kind=='differential':entry.update(pairs_per_key=256,max_difference_count=statistics.mean(counts),max_bit_bias=statistics.mean(biases))
-        else:entry.update(plaintexts_per_key=256,max_abs_correlation=statistics.mean(linear))
+        elif kind=='differential':entry.update(pairs_per_key=256,max_difference_count=statistics.mean(counts),max_bit_bias=statistics.mean(biases),details=per_trial)
+        else:entry.update(plaintexts_per_key=256,max_abs_correlation=statistics.mean(linear),details=per_trial)
         rows.append(entry)
     return {'kind':kind,'seed':seed,'trials':trials,'rows':rows,'source':'Live bounded adapter of final teammate code',
             'scope': 'Original integral equation; only AES-4 has supplied master-key recovery verification' if kind=='integral' else

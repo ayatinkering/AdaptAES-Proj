@@ -312,6 +312,45 @@ function ReportStudy({ catalog }) {
       [],
     security =
       catalog?.original_study?.["roundwise_security_summary.csv"] || [];
+  const overall = ["standard_aes_10", "fixed_reduced_aes_4", "adaptaes"].map(
+    (mode) => {
+      const values = timing.filter((row) => row.mode === mode),
+        count = values.reduce(
+          (sum, row) => sum + Number(row.timing_sample_count),
+          0,
+        );
+      return {
+        mode,
+        design:
+          mode === "adaptaes"
+            ? "Original AdaptAES"
+            : mode === "standard_aes_10"
+              ? "AES-10"
+              : "AES-4",
+        count,
+        enc:
+          values.reduce(
+            (sum, row) =>
+              sum +
+              Number(row.mean_encryption_time_ns) *
+                Number(row.timing_sample_count),
+            0,
+          ) /
+          count /
+          1e6,
+        dec:
+          values.reduce(
+            (sum, row) =>
+              sum +
+              Number(row.mean_decryption_time_ns) *
+                Number(row.timing_sample_count),
+            0,
+          ) /
+          count /
+          1e6,
+      };
+    },
+  );
   const rows = timing
     .filter((r) => r.payload_bucket === bucket)
     .map((r) => ({
@@ -385,6 +424,37 @@ function ReportStudy({ catalog }) {
           </tbody>
         </table>
       </div>
+      <h3>Overall original timing study</h3>
+      <div className="demo-table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Cipher</th>
+              <th>Timed payloads</th>
+              <th>Enc. ms</th>
+              <th>Dec. ms</th>
+              <th>Enc. reduction %</th>
+            </tr>
+          </thead>
+          <tbody>
+            {overall
+              .filter((r) => r.count)
+              .map((r) => (
+                <tr key={r.mode}>
+                  <td>{r.design}</td>
+                  <td>{r.count}</td>
+                  <td>{fmt(r.enc, 2)}</td>
+                  <td>{fmt(r.dec, 2)}</td>
+                  <td>{fmt((1 - r.enc / overall[0].enc) * 100, 2)}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="demo-note">
+        Overall times weight each payload-category mean by its timed-payload
+        count. The workload distribution determines the aggregate saving.
+      </p>
       <h3>Recorded round-wise statistics</h3>
       <div className="demo-table-scroll">
         <table>
@@ -1150,9 +1220,14 @@ function AttacksScreen({ catalog }) {
               </>
             ) : kind === "substitution" ? (
               <>
+                <h4>Encrypted block replacement</h4>
+                <p>Original target ciphertext</p>
+                <code>{detail.target_ciphertext_block}</code>
+                <p>Attacker’s ciphertext inserted</p>
+                <code>{detail.modified_ciphertext_block}</code>
                 <div className="demo-block-change">
                   <div>
-                    <h4>Original target block</h4>
+                    <h4>Original target plaintext</h4>
                     <code>{detail.target_first_block}</code>
                   </div>
                   <div>
@@ -1174,13 +1249,46 @@ function AttacksScreen({ catalog }) {
                 </p>
               </>
             ) : (
-              <p>
-                {kind === "differential"
-                  ? `${row.pairs_per_key} plaintext pairs; largest difference count ${row.max_difference_count}; largest bit bias ${fmt(row.max_bit_bias, 4)}.`
-                  : `${row.plaintexts_per_key} plaintexts; strongest tested absolute correlation ${fmt(row.max_abs_correlation, 4)}.`}{" "}
-                These probes measure finite-sample patterns; they do not recover
-                a key.
-              </p>
+              <>
+                <p>
+                  {kind === "differential"
+                    ? `${row.pairs_per_key} plaintext pairs; largest difference count ${row.max_difference_count}; largest bit bias ${fmt(row.max_bit_bias, 4)}.`
+                    : `${row.plaintexts_per_key} plaintexts; strongest tested absolute correlation ${fmt(row.max_abs_correlation, 4)}.`}{" "}
+                  No key recovery is attempted by this probe.
+                </p>
+                {detail && (
+                  <div>
+                    <h4>Actual sample from this run</h4>
+                    <p>Plaintext</p>
+                    <code>{detail.plaintext}</code>
+                    {kind === "differential" ? (
+                      <>
+                        <p>Same plaintext with bit 0 flipped</p>
+                        <code>{detail.changed_plaintext}</code>
+                        <p>Original ciphertext</p>
+                        <code>{detail.ciphertext}</code>
+                        <p>Ciphertext after the flip</p>
+                        <code>{detail.changed_ciphertext}</code>
+                        <p>
+                          {detail.changed_bits} of 128 ciphertext bits changed
+                          in this sample.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p>Ciphertext</p>
+                        <code>{detail.ciphertext}</code>
+                        <p>
+                          Strongest tested mask pair: plaintext bit{" "}
+                          {detail.input_bit} → ciphertext bit{" "}
+                          {detail.output_bit} (MSB-first indexing). Signed
+                          correlation: {fmt(detail.correlation, 4)}.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </section>
           <p className="demo-note">
@@ -1255,7 +1363,10 @@ export function TwoScreenLab() {
     [catalog, setCatalog] = useState(null),
     [error, setError] = useState("");
   useEffect(() => {
-    const f = () => setPage(location.hash === "#attacks" ? "attacks" : "home");
+    const f = () => {
+      setPage(location.hash === "#attacks" ? "attacks" : "home");
+      window.scrollTo({ top: 0, behavior: "instant" });
+    };
     window.addEventListener("hashchange", f);
     request("results")
       .then(setCatalog)

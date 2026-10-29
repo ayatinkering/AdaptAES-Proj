@@ -72,6 +72,17 @@ class WorkbenchTests(unittest.TestCase):
         small=next(row for row in r['bucket_security_performance_summary.csv'] if row['mode']=='adaptaes' and row['payload_bucket']=='1-128')
         self.assertAlmostEqual(float(small['mean_encryption_time_ns'])/1e6,.6005300943396227)
 
+    def test_probe_evidence_matches_measured_samples(self):
+        for kind in ('differential','linear'):
+            r=research.experiments(kind,42,1,lambda _:None)
+            for row in r['rows']:
+                sample=row['details'][0]
+                self.assertEqual(len(bytes.fromhex(sample['plaintext'])),16)
+                if kind=='differential':
+                    a=bytes.fromhex(sample['ciphertext']);b=bytes.fromhex(sample['changed_ciphertext'])
+                    self.assertEqual(sample['changed_bits'],sum((x^y).bit_count() for x,y in zip(a,b)))
+                else:self.assertAlmostEqual(abs(sample['correlation']),row['max_abs_correlation'])
+
     def test_reject_bad_inputs(self):
         for body in (self.body(b''),self.body(b'x',mode='unknown'),self.body(b'x',block=2),self.body(b'x',bit=128),{'data':'invalid','key':'123'}):
             with self.assertRaises(ValueError):research.encrypt_request(body)
