@@ -150,3 +150,17 @@ recorded measurements. The archived round-wise sample counts sum to 90,000.
 
 Restart the Python server after updating backend files. A frontend version guard
 reports an old comparison API instead of rendering incomplete timing/statistics.
+
+## Expanded performance measures
+
+The comparison API accepts 3–15 timed repetitions (UI: 5 or 15), always excluding
+one warm-up. It now reports thread CPU encryption time, mean/min/max encryption
+latency, sample standard deviation, coefficient of variation, paired round-trip
+median, microseconds per padded block and per payload byte, reciprocal-median
+message rate, and padding/ciphertext size. Raw encryption samples are included in
+CSV exports. Min/max and variation describe the collected samples only; no tail
+latency, energy consumption, CPU utilisation or memory-efficiency claims are made.
+
+The frontend can derive per-block cost, throughput and message rate from existing
+API fields. It disables missing CPU/variation views until the server is restarted,
+and explicitly labels the sum-of-medians fallback for round-trip time.

@@ -24,16 +24,73 @@ const chosen = (n) =>
       : n <= 1024
         ? "AES-8"
         : "AES-10";
-const colour = (n) =>
-  /ARX/.test(n)
-    ? "#087a48"
-    : n === "AES-10"
-      ? "#1d63c9"
-      : n === "AES-4"
-        ? "#c43232"
-        : n === "AES-5"
-          ? "#946400"
-          : "#52657e";
+const palette = {
+  "AES-4": "#d14968",
+  "AES-4 + ARX": "#168c79",
+  "AES-5": "#cb8312",
+  "AES-6": "#6370c9",
+  "AES-8": "#9b58a4",
+  "AES-10": "#2868d6",
+  "Original AdaptAES": "#7b6870",
+  "AdaptAES–ARX": "#08744a",
+};
+const colour = (n) => palette[n] || "#52657e";
+const performanceMetrics = {
+  median_ms: {
+    label: "Encryption",
+    unit: "ms",
+    direction: "lower",
+    note: "Median encryption time",
+  },
+  decryption_ms: {
+    label: "Decryption",
+    unit: "ms",
+    direction: "lower",
+    note: "Median decryption time",
+  },
+  throughput_mib_s: {
+    label: "Encryption throughput",
+    unit: "MiB/s",
+    direction: "higher",
+    note: "Payload bytes processed per second",
+  },
+  decryption_mib_s: {
+    label: "Decryption throughput",
+    unit: "MiB/s",
+    direction: "higher",
+    note: "Payload bytes recovered per second",
+  },
+  roundtrip_ms: {
+    label: "Encrypt + decrypt",
+    unit: "ms",
+    direction: "lower",
+    note: "Median paired encryption and decryption time",
+  },
+  us_per_block: {
+    label: "Cost per AES block",
+    unit: "µs/block",
+    direction: "lower",
+    note: "Encryption time divided by padded 16-byte block count",
+  },
+  cpu_ms: {
+    label: "Encryption CPU time",
+    unit: "ms",
+    direction: "lower",
+    note: "Median calling-thread CPU time; excludes time when the thread is not scheduled",
+  },
+  stddev_ms: {
+    label: "Timing variation",
+    unit: "ms",
+    direction: "lower",
+    note: "Sample standard deviation of encryption times; a small run set is descriptive, not a guarantee",
+  },
+  encryptions_per_second: {
+    label: "Message rate",
+    unit: "messages/s",
+    direction: "higher",
+    note: "Reciprocal of median encryption time; no network or queuing included",
+  },
+};
 const encode = (bytes) => {
   let s = "";
   for (const b of bytes) s += String.fromCharCode(b);
@@ -551,6 +608,71 @@ function ReportStudy({ catalog }) {
     </details>
   );
 }
+function PerformanceDetails({ comparison, rows }) {
+  return (
+    <details className="performance-details">
+      <summary>Timing consistency and processing cost</summary>
+      <div className="demo-table-scroll">
+        <table>
+          <thead>
+            <tr>
+              {[
+                "Cipher",
+                "Mean ms",
+                "Min ms",
+                "Max ms",
+                "Std. dev. ms",
+                "Variation %",
+                "CPU ms",
+                "µs / block",
+                "Messages / s",
+              ].map((name) => (
+                <th key={name}>{name}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.mode}>
+                <td style={{ color: colour(r.design) }}>{r.design}</td>
+                {[
+                  "mean_ms",
+                  "min_ms",
+                  "max_ms",
+                  "stddev_ms",
+                  "cv_percent",
+                  "cpu_ms",
+                  "us_per_block",
+                  "encryptions_per_second",
+                ].map((field) => (
+                  <td key={field}>{fmt(r[field])}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="demo-note">
+        Variation = sample standard deviation ÷ mean × 100. CPU time is measured
+        per calling thread, not CPU utilisation. Min/max describe only these{" "}
+        {comparison.repeats} runs; they are not population tail-latency
+        estimates.
+      </p>
+      <p className="demo-note">
+        {rows[0].blocks ?? Math.floor(comparison.bytes / 16) + 1} padded blocks
+        ·{" "}
+        {rows[0].ciphertext_bytes ??
+          (Math.floor(comparison.bytes / 16) + 1) * 16}{" "}
+        ciphertext bytes ·{" "}
+        {rows[0].padding_bytes ??
+          (Math.floor(comparison.bytes / 16) + 1) * 16 - comparison.bytes}{" "}
+        padding bytes. Per-block cost includes wrapper, padding and
+        key-expansion cost.
+      </p>
+    </details>
+  );
+}
+
 function EncryptionScreen({ catalog, onAttacks }) {
   const [text, setText] = useState(
       "Information security lab: AdaptAES with ARX mixing.",
@@ -561,10 +683,30 @@ function EncryptionScreen({ catalog, onAttacks }) {
     [result, setResult] = useState(null),
     [comparison, setComparison] = useState(null),
     [metric, setMetric] = useState("median_ms"),
+    [repeats, setRepeats] = useState(5),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const bytes = file?.bytes || new TextEncoder().encode(text);
   const size = bytes.length;
+  const performanceRows = comparison?.rows.map((r) => ({
+    ...r,
+    decryption_mib_s:
+      r.decryption_mib_s ??
+      comparison.bytes / 2 ** 20 / (r.decryption_ms / 1000),
+    roundtrip_ms: r.roundtrip_ms ?? r.median_ms + r.decryption_ms,
+    us_per_block:
+      r.us_per_block ??
+      (r.median_ms * 1000) / (Math.floor(comparison.bytes / 16) + 1),
+    encryptions_per_second: r.encryptions_per_second ?? 1000 / r.median_ms,
+    saved_ms:
+      r.saved_ms ??
+      comparison.rows.find((b) => b.mode === "aes10").median_ms - r.median_ms,
+  }));
+  const adaptivePerformance = performanceRows?.find(
+    (r) => r.mode === "adaptive_arx",
+  );
+  const metricInfo = performanceMetrics[metric];
+
   function invalidate() {
     setResult(null);
     setComparison(null);
@@ -579,7 +721,7 @@ function EncryptionScreen({ catalog, onAttacks }) {
     setBusy(true);
     setError("");
     try {
-      const body = { data: encode(bytes), key, mode };
+      const body = { data: encode(bytes), key, mode, repeats };
       const encrypted = await request("encrypt", body);
       const compared = await request("compare", body);
       if (
@@ -744,6 +886,21 @@ function EncryptionScreen({ catalog, onAttacks }) {
               </select>
             </label>
           </details>
+          <label className="performance-repeat">
+            Timed repetitions
+            <select
+              aria-label="Timed repetitions"
+              disabled={busy}
+              value={repeats}
+              onChange={(e) => {
+                setRepeats(Number(e.target.value));
+                invalidate();
+              }}
+            >
+              <option value={5}>5 · quick comparison</option>
+              <option value={15}>15 · more timing samples</option>
+            </select>
+          </label>
           <button
             className="demo-primary"
             disabled={busy || !size || size > 4096}
@@ -771,31 +928,71 @@ function EncryptionScreen({ catalog, onAttacks }) {
                 Export CSV
               </button>
             </div>
-            <div className="demo-metric-controls">
-              {[
-                ["median_ms", "Encryption"],
-                ["decryption_ms", "Decryption"],
-                ["throughput_mib_s", "Throughput"],
-              ].map(([id, name]) => (
-                <button
-                  key={id}
-                  className={metric === id ? "selected" : ""}
-                  onClick={() => setMetric(id)}
+            <div className="performance-headline">
+              <div>
+                <span>AdaptAES–ARX speedup</span>
+                <strong>{fmt(adaptivePerformance.speedup, 2)}×</strong>
+                <small>Compared with AES-10</small>
+              </div>
+              <div>
+                <span>Encryption time saved</span>
+                <strong
+                  className={
+                    adaptivePerformance.saved_ms >= 0
+                      ? "demo-pass"
+                      : "demo-fail"
+                  }
                 >
-                  {name}
-                </button>
-              ))}
+                  {fmt(adaptivePerformance.saved_ms)} ms
+                </strong>
+                <small>Negative means slower in this run</small>
+              </div>
+              <div>
+                <span>Timing samples</span>
+                <strong>{comparison.repeats} per cipher</strong>
+                <small>One warm-up excluded</small>
+              </div>
+            </div>
+            <div className="performance-metric-picker">
+              <label>
+                Performance measure
+                <select
+                  aria-label="Performance measure"
+                  value={metric}
+                  onChange={(e) => setMetric(e.target.value)}
+                >
+                  {Object.entries(performanceMetrics).map(([id, m]) => (
+                    <option
+                      key={id}
+                      value={id}
+                      disabled={performanceRows.some(
+                        (r) => r[id] === undefined,
+                      )}
+                    >
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span>
+                {metricInfo.direction === "lower"
+                  ? "Lower is faster / more consistent"
+                  : "Higher is faster"}
+              </span>
             </div>
             <Plot
-              rows={comparison.rows}
+              rows={performanceRows}
               field={metric}
-              unit={metric === "throughput_mib_s" ? "MiB/s" : "ms"}
-              label={
-                metric === "throughput_mib_s"
-                  ? "Payload throughput · higher is faster"
-                  : "Median time · lower is faster"
-              }
+              unit={metricInfo.unit}
+              label={metricInfo.note}
             />
+            {!comparison.rows[0].encryption_samples_ms && (
+              <p className="demo-note">
+                Restart the Python server to enable CPU and run-variation
+                measurements. Encrypt + decrypt is currently the sum of the two
+                medians.
+              </p>
+            )}
             <div className="demo-table-scroll">
               <table>
                 <thead>
@@ -847,6 +1044,7 @@ function EncryptionScreen({ catalog, onAttacks }) {
               time. Timings measure the server, not the visual replay.
             </p>
           </section>
+          <PerformanceDetails comparison={comparison} rows={performanceRows} />
           <LiveSecurity rows={comparison.rows} />
           <Trace value={result} />
           <button className="demo-primary" onClick={onAttacks}>

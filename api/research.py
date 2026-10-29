@@ -160,17 +160,19 @@ def compare_request(body):
     data,key,_=decode_request(body)
     if len(data)>4096:raise ValueError('Comparison is limited to 4,096 bytes.')
     names=['aes4','hybrid','aes5','aes6','aes8','aes10','adaptive','adaptive_arx']
-    samples={m:[] for m in names};dec_samples={m:[] for m in names};outputs={}
-    for repeat in range(6):
+    repeats=body.get('repeats',5)
+    if type(repeats) is not int or not 3<=repeats<=15:raise ValueError('Choose 3–15 timed repetitions.')
+    samples={m:[] for m in names};dec_samples={m:[] for m in names};cpu_samples={m:[] for m in names};outputs={}
+    for repeat in range(repeats+1):
         order=names[repeat%len(names):]+names[:repeat%len(names)]
         if repeat%2:order=list(reversed(order))
         for mode in order:
             config=selection(mode,len(data));config['original_length']=len(data)
-            start=time.perf_counter_ns();ct=crypt(data,key,config);elapsed=time.perf_counter_ns()-start
+            cpu_start=time.thread_time_ns();start=time.perf_counter_ns();ct=crypt(data,key,config);elapsed=time.perf_counter_ns()-start;cpu_elapsed=time.thread_time_ns()-cpu_start
             start=time.perf_counter_ns();recovered=crypt(ct,key,config,True);dec_elapsed=time.perf_counter_ns()-start
             if recovered!=data:raise ValueError('Comparison verification failed.')
             outputs[mode]=ct
-            if repeat:samples[mode].append(elapsed);dec_samples[mode].append(dec_elapsed)
+            if repeat:samples[mode].append(elapsed);dec_samples[mode].append(dec_elapsed);cpu_samples[mode].append(cpu_elapsed)
     baseline=statistics.median(samples['aes10']);rows=[];block=aes.pad_data(data)[:16]
     for mode in names:
         config=selection(mode,len(data));fn=block_functions(config,key)[0];cipher=fn(block);plain_ae=[];key_ae=[]
@@ -189,9 +191,18 @@ def compare_request(body):
                      'decryption_mib_s':len(data)/2**20/(dec_ms/1000),'speedup':baseline/(enc_ms*1e6),
                      'reduction_percent':(1-enc_ms*1e6/baseline)*100,'verified':True,
                      'plaintext_avalanche_percent':statistics.mean(plain_ae),'key_avalanche_percent':statistics.mean(key_ae),
-                     'block_entropy':statistics.mean(entropies),'diffusion_samples':8})
-    return {'rows':rows,'bytes':len(data),'repeats':5,
-            'scope':'Same payload and key; one warm-up and five timed runs; rotating order; medians. Padding and key expansion included. Encryption and decryption timed separately; round-trip verified.',
+                     'block_entropy':statistics.mean(entropies),'diffusion_samples':8,
+                     'cpu_ms':statistics.median(cpu_samples[mode])/1e6,
+                     'mean_ms':statistics.mean(samples[mode])/1e6,'min_ms':min(samples[mode])/1e6,'max_ms':max(samples[mode])/1e6,
+                     'stddev_ms':statistics.stdev(samples[mode])/1e6,'cv_percent':statistics.stdev(samples[mode])/statistics.mean(samples[mode])*100,
+                     'roundtrip_ms':statistics.median([a+b for a,b in zip(samples[mode],dec_samples[mode])])/1e6,
+                     'us_per_block':enc_ms*1000/(len(ct)//16),'us_per_byte':enc_ms*1000/len(data),
+                     'encryptions_per_second':1000/enc_ms,'saved_ms':baseline/1e6-enc_ms,
+                     'blocks':len(ct)//16,'ciphertext_bytes':len(ct),'padding_bytes':len(ct)-len(data),
+                     'padding_overhead_percent':(len(ct)-len(data))/len(data)*100,'sample_count':repeats,
+                     'encryption_samples_ms':[n/1e6 for n in samples[mode]]})
+    return {'rows':rows,'bytes':len(data),'repeats':repeats,
+            'scope':'Same payload and key; one warm-up excluded; rotating execution order; configured number of timed repetitions; medians. Padding and key expansion included. Encryption and decryption timed separately; round-trip verified.',
             'statistical_scope':'Eight single-bit plaintext flips and eight single-bit key flips on the first padded block. Entropy averaged over individual 16-byte ciphertext blocks (empirical maximum 4 bits/byte). Statistical indicators, not attack resistance.'}
 
 

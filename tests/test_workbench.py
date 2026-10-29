@@ -59,10 +59,21 @@ class WorkbenchTests(unittest.TestCase):
         for row in r['rows']:
             self.assertTrue(row['verified'])
             self.assertGreater(row['decryption_ms'],0)
+            self.assertEqual(len(row['encryption_samples_ms']),r['repeats'])
+            self.assertLessEqual(row['min_ms'],row['median_ms'])
+            self.assertLessEqual(row['median_ms'],row['max_ms'])
+            self.assertGreater(row['cpu_ms'],0)
+            self.assertAlmostEqual(row['us_per_block'],row['median_ms']*1000/row['blocks'])
+            self.assertAlmostEqual(row['encryptions_per_second'],1000/row['median_ms'])
+            self.assertGreaterEqual(row['stddev_ms'],0)
             self.assertAlmostEqual(row['speedup'],baseline['median_ms']/row['median_ms'])
             self.assertTrue(0<=row['plaintext_avalanche_percent']<=100)
             self.assertTrue(0<=row['key_avalanche_percent']<=100)
             self.assertTrue(0<=row['block_entropy']<=4)
+
+    def test_comparison_repetitions_are_bounded(self):
+        for repeats in (0,2,16,True,5.5):
+            with self.assertRaises(ValueError):research.compare_request(self.body(b'x',repeats=repeats))
 
     def test_report_reference_contains_original_round_statistics(self):
         r=research.recorded()['original_study']
