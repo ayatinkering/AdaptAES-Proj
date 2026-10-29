@@ -93,10 +93,7 @@ function ErrorLine({ error }) {
 function SectionTitle({ number: step, children, aside }) {
   return (
     <div className="section-title">
-      <h2>
-        {step && <span className="step">{step}</span>}
-        {children}
-      </h2>
+      <h2>{children}</h2>
       {aside}
     </div>
   );
@@ -153,10 +150,8 @@ function RoundOverview({ config, result, stage, onStage }) {
       aria-label="Round allocation and encryption progress"
     >
       <div className="round-overview-heading">
-        <h2>Inside this encryption</h2>
-        <span>
-          {result ? "Verified block trace" : "Selected path · ready to run"}
-        </span>
+        <h2>Encryption rounds</h2>
+        <span>{result ? "Block trace verified" : "Ready"}</span>
       </div>
       <div className="round-facts">
         <span>
@@ -516,9 +511,7 @@ function Workspace({ openSource, onAnalyze }) {
     <>
       <div className="page-heading">
         <div>
-          <h1>
-            Encryption lab<span className="title-dot">.</span>
-          </h1>
+          <h1>Encryption lab</h1>
           <p>
             Encrypt a message. See the selected rounds. Compare with AES-10.
           </p>
@@ -527,7 +520,7 @@ function Workspace({ openSource, onAnalyze }) {
           className="text-button source-link"
           onClick={() => openSource("aes_hybrid.py")}
         >
-          Read the cipher <span>↗</span>
+          Cipher source
         </button>
       </div>
 
@@ -669,11 +662,6 @@ function Workspace({ openSource, onAnalyze }) {
             </div>
           </div>
           <div className="automatic-selection">
-            <span>
-              {mode.startsWith("adaptive")
-                ? "Automatic selection"
-                : "Fixed reference"}
-            </span>
             <strong>{config.label}</strong>
             <small>
               {number(size, 0)} bytes → {config.rounds} rounds
@@ -1023,7 +1011,7 @@ function Workspace({ openSource, onAnalyze }) {
           </div>
           <div className="state-inspection">
             <div className="state-heading">
-              <h3>{current?.name || "A state, before and after."}</h3>
+              <h3>{current?.name || "Block state"}</h3>
               <div className="trace-controls">
                 <button
                   title="Replay measured intermediate states at a readable pace; this is not encryption duration"
@@ -1157,7 +1145,7 @@ function Workspace({ openSource, onAnalyze }) {
         </section>
       )}
       <div className="next-section">
-        <p>Inspect the construction. Then test the evidence.</p>
+        <p></p>
         <button className="text-button" onClick={onAnalyze}>
           Open attack analysis ↗
         </button>
@@ -1277,9 +1265,7 @@ function Analysis({ catalog, openSource }) {
     <>
       <div className="page-heading">
         <div>
-          <h1>
-            Attack analysis<span className="title-dot">.</span>
-          </h1>
+          <h1>Attack analysis</h1>
           <p>
             Choose a test. Run it locally or inspect the recorded measurements.
           </p>
@@ -1288,7 +1274,7 @@ function Analysis({ catalog, openSource }) {
           className="text-button"
           onClick={() => openSource(SOURCE_MAP[kind])}
         >
-          Read experiment source ↗
+          Experiment source
         </button>
       </div>
       <div
@@ -1668,9 +1654,7 @@ function Results({ catalog, openSource }) {
     <>
       <div className="page-heading">
         <div>
-          <h1>
-            Research record<span className="title-dot">.</span>
-          </h1>
+          <h1>Research record</h1>
           <p>
             Measured performance, attack observations, and the source behind
             every result.
@@ -1684,26 +1668,6 @@ function Results({ catalog, openSource }) {
         >
           Export measurements ↓
         </button>
-      </div>
-      <div
-        className="research-highlights"
-        aria-label="Recorded research findings"
-      >
-        <div>
-          <span>Integral attack · AES-4</span>
-          <strong>20 / 20</strong>
-          <small>Master keys recovered</small>
-        </div>
-        <div>
-          <span>Same equation · AES-4 + ARX</span>
-          <strong>0 candidates</strong>
-          <small>Across 20 recorded trials</small>
-        </div>
-        <div>
-          <span>Hybrid construction</span>
-          <strong>4 rounds + ARX</strong>
-          <small>Reversible mixing after round 2</small>
-        </div>
       </div>
       <div className="tabs">
         <button
