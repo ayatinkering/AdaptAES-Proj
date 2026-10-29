@@ -20,7 +20,7 @@ html {
 body {
   margin: 0;
   background: #090909;
-  color: #e9e5dc;
+  color: #f4f0e7;
   font-family: "JetBrains Mono", "Courier New", monospace;
   font-size: 14px;
   font-weight: 400;
@@ -104,7 +104,7 @@ h3 {
 }
 small {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 code,
 pre {
@@ -115,7 +115,7 @@ pre {
 }
 select {
   max-width: 100%;
-  color: #e9e5dc;
+  color: #f4f0e7;
   background: #151513;
   border: 1px solid #44413a;
   padding: 10px 32px 10px 12px;
@@ -124,7 +124,7 @@ select {
 input {
   width: 100%;
   background: #101010;
-  color: #e9e5dc;
+  color: #f4f0e7;
   border: 1px solid #44413a;
   padding: 10px 12px;
   min-height: 42px;
@@ -135,7 +135,7 @@ input {
   padding: 0 48px;
 }
 .muted {
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .num {
   font-variant-numeric: tabular-nums;
@@ -177,7 +177,7 @@ header {
 }
 .wordmark-version {
   font-size: 13px;
-  color: #aaa69d;
+  color: #c5c1b8;
   letter-spacing: 0;
   margin-left: 6px;
 }
@@ -190,13 +190,13 @@ nav {
 nav a {
   display: flex;
   align-items: center;
-  color: #aaa69d;
+  color: #c5c1b8;
   border-bottom: 2px solid transparent;
   padding: 2px 0 0;
 }
 nav a:hover,
 nav a.current {
-  color: #e9e5dc;
+  color: #f4f0e7;
 }
 nav a.current {
   border-color: #d6c5a6;
@@ -206,7 +206,7 @@ nav a.current {
   align-items: center;
   gap: 9px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   white-space: nowrap;
 }
 .connection-dot {
@@ -226,7 +226,7 @@ nav a.current {
 }
 .page-heading p {
   margin-top: 9px;
-  color: #aaa69d;
+  color: #c5c1b8;
   font-size: 12px;
 }
 .text-button {
@@ -296,14 +296,14 @@ nav a.current {
   background: none;
   border: 0;
   border-bottom: 2px solid transparent;
-  color: #aaa69d;
+  color: #c5c1b8;
   padding: 0 0 13px;
   white-space: nowrap;
   font-size: 13px;
 }
 .tabs button:hover,
 .tabs button.active {
-  color: #e9e5dc;
+  color: #f4f0e7;
 }
 .tabs button.active {
   border-bottom-color: #d6c5a6;
@@ -319,13 +319,13 @@ textarea {
   max-height: 360px;
   background: #141413;
   border: 1px solid #34322e;
-  color: #e9e5dc;
+  color: #f4f0e7;
   padding: 18px;
   font-size: 15px;
   line-height: 1.85;
 }
 textarea::placeholder {
-  color: #8e8b82;
+  color: #bdb9b0;
 }
 .input-meta {
   display: flex;
@@ -334,11 +334,11 @@ textarea::placeholder {
   align-items: center;
   margin-top: 10px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .input-meta > span:first-child {
   font-size: 12px;
-  color: #e9e5dc;
+  color: #f4f0e7;
 }
 .thresholds {
   margin: 22px 0 24px;
@@ -346,7 +346,7 @@ textarea::placeholder {
   align-items: center;
   gap: 12px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   flex-wrap: wrap;
 }
 .thresholds > div {
@@ -380,7 +380,7 @@ textarea::placeholder {
 .key-details summary {
   font-size: 12px;
   cursor: pointer;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .key-details summary > span {
   float: right;
@@ -425,7 +425,7 @@ textarea::placeholder {
 }
 .secondary {
   background: transparent;
-  color: #e9e5dc;
+  color: #f4f0e7;
   border-color: #4c4941;
 }
 .secondary:hover:not(:disabled) {
@@ -433,7 +433,7 @@ textarea::placeholder {
 }
 .status {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .selected-cipher {
   display: flex;
@@ -444,20 +444,20 @@ textarea::placeholder {
 }
 .selected-cipher > div > span {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .selected-cipher h3 {
   font-size: 31px;
   line-height: 1.4;
   margin-top: 5px;
-  color: #e9e5dc;
+  color: #f4f0e7;
   letter-spacing: -0.5px;
 }
 .bit-label {
   text-align: right;
   font-size: 12px;
   line-height: 1.9;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .cipher-path {
   display: flex;
@@ -469,7 +469,7 @@ textarea::placeholder {
 }
 .path-terminal {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .path-line {
   height: 1px;
@@ -490,7 +490,7 @@ textarea::placeholder {
 }
 .policy-note {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   max-width: 69ch;
   min-height: 43px;
   line-height: 1.9;
@@ -509,7 +509,7 @@ textarea::placeholder {
 .empty-brackets {
   font-size: 36px;
   letter-spacing: 3px;
-  color: #817765;
+  color: #bdb5a6;
   margin-bottom: 18px;
 }
 .empty-output p {
@@ -517,7 +517,7 @@ textarea::placeholder {
 }
 .empty-output > span {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   line-height: 1.9;
   margin-top: 8px;
 }
@@ -525,7 +525,7 @@ textarea::placeholder {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 24px;
   margin-bottom: 10px;
 }
@@ -555,7 +555,7 @@ textarea::placeholder {
 }
 .metrics > div > span {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .metrics strong {
   font-size: 18px;
@@ -567,7 +567,7 @@ textarea::placeholder {
 }
 .measurement {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin: 13px 0;
 }
 .verification {
@@ -583,7 +583,7 @@ textarea::placeholder {
   color: #d6c5a6;
 }
 .verification > span:last-child {
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .download-row {
   display: flex;
@@ -612,7 +612,7 @@ textarea::placeholder {
 }
 .block-select {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -645,15 +645,15 @@ textarea::placeholder {
   text-align: left;
   font-size: 12px;
   padding: 9px 15px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .operation-list button > span {
   font-size: 12px;
-  color: #817765;
+  color: #bdb5a6;
 }
 .operation-list button.selected {
   background: #26231d;
-  color: #e9e5dc;
+  color: #f4f0e7;
   border-left-color: #d6c5a6;
 }
 .operation-list button:hover {
@@ -668,7 +668,7 @@ textarea::placeholder {
   gap: 18px;
   padding: 12px 24px;
   font-size: 12px;
-  color: #817c72;
+  color: #bdb9b0;
 }
 .state-inspection {
   padding: 23px 28px;
@@ -703,7 +703,7 @@ textarea::placeholder {
 }
 .matrix-caption {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   display: block;
   margin-bottom: 8px;
 }
@@ -733,12 +733,12 @@ textarea::placeholder {
   margin-top: 6px;
 }
 .matrix-arrow {
-  color: #817765;
+  color: #bdb5a6;
 }
 .state-note {
   max-width: 75ch;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 6px;
 }
 .arx-detail {
@@ -766,7 +766,7 @@ textarea::placeholder {
 }
 .arx-detail p {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .comparison,
 .diffusion {
@@ -794,7 +794,7 @@ textarea::placeholder {
 }
 .diffusion-layout strong span {
   font-size: 13px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .diffusion-layout p {
   font-size: 12px;
@@ -818,7 +818,7 @@ textarea::placeholder {
   gap: 15px;
   margin: 30px 0 50px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .file-zone {
   min-height: 159px;
@@ -850,12 +850,12 @@ textarea::placeholder {
 .file-label span {
   display: block;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 8px;
 }
 .file-preview {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   margin-top: 12px;
@@ -900,7 +900,7 @@ textarea::placeholder {
   border: 0;
   padding: 8px 12px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .segmented button.active {
   background: #d6c5a6;
@@ -909,7 +909,7 @@ textarea::placeholder {
 .experiment-explanation {
   max-width: 85ch;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin: 18px 0 24px;
 }
 .result-heading {
@@ -920,7 +920,7 @@ textarea::placeholder {
   padding-top: 20px;
   margin-top: 24px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   overflow-wrap: anywhere;
 }
 .result-heading button {
@@ -931,7 +931,7 @@ textarea::placeholder {
 }
 .chart-caption {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-bottom: 22px;
 }
 .bar-row {
@@ -968,14 +968,14 @@ textarea::placeholder {
 }
 .finding p {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   line-height: 1.9;
   margin-top: 8px;
   max-width: 95ch;
 }
 .scope-note {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   max-width: 105ch;
   line-height: 1.9;
   margin: 22px 0;
@@ -1010,7 +1010,7 @@ td {
 }
 th {
   font-weight: 400;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 td {
   color: #d4cfc4;
@@ -1028,7 +1028,7 @@ td:first-child {
 .experiment-controls label,
 .performance-controls label {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1068,7 +1068,7 @@ progress {
 }
 .experiment-empty p {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 10px;
 }
 .research-boundary {
@@ -1076,7 +1076,7 @@ progress {
   margin: 36px 0 60px;
 }
 .research-boundary p {
-  color: #aaa69d;
+  color: #c5c1b8;
   font-size: 12px;
   margin-top: 14px;
   line-height: 1.95;
@@ -1086,7 +1086,7 @@ progress {
   grid-template-columns: 1fr auto;
   gap: 12px 30px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 22px;
   border-top: 1px solid #393732;
   padding-top: 18px;
@@ -1204,7 +1204,7 @@ progress {
 }
 .block-demo p {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   margin-top: 15px;
 }
 .performance-controls {
@@ -1236,12 +1236,12 @@ progress {
   color: #d6c5a6;
 }
 .source-index button > span:last-child {
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .source-hash {
   margin-top: 26px;
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
   overflow-wrap: anywhere;
 }
 .paper {
@@ -1281,7 +1281,7 @@ progress {
 }
 .paper-stats span {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .paper h3 {
   margin-top: 30px;
@@ -1316,7 +1316,7 @@ footer {
   font-size: 12px;
 }
 .footer-note {
-  color: #aaa69d;
+  color: #c5c1b8;
   font-size: 12px;
 }
 footer button {
@@ -1324,7 +1324,7 @@ footer button {
 }
 dialog {
   background: #111;
-  color: #e9e5dc;
+  color: #f4f0e7;
   border: 1px solid #565043;
   width: min(1100px, 95vw);
   max-height: 88vh;
@@ -1346,7 +1346,7 @@ dialog::backdrop {
 }
 .dialog-header span {
   font-size: 12px;
-  color: #aaa69d;
+  color: #c5c1b8;
 }
 .source-code {
   font-size: 12px;
@@ -2527,7 +2527,7 @@ details > summary {
 .demo-guide code {
   background: #29261e;
   padding: 3px 6px;
-  color: #e9e5dc;
+  color: #f4f0e7;
 }
 .performance-summary {
   display: grid;
@@ -2709,4 +2709,28 @@ body {
     border-right: 0;
     border-bottom: 1px solid #383a35;
   }
+}
+
+/* Accessible dark palette: strong text and visible interactive boundaries. */
+:root { --accessible-muted: #c5c1b8; --accessible-edge: #85867f; }
+body { background: #101110; color: #f4f0e7; }
+.workbench, .inspector, .experiment, .comparison { background: #151715; }
+.workbench, .input-pane, .direct-comparison, .direct-comparison > div { border-color: #656861; }
+input, textarea, select { background: #1b1e1b; color: #f4f0e7; border-color: var(--accessible-edge); }
+input::placeholder, textarea::placeholder { color: #bdbeb5; opacity: 1; }
+.secondary, .thresholds button, .trace-controls button, .view-switch button, .operation-list button { border-color: var(--accessible-edge); }
+button:disabled { opacity: 1; color: #a7aaa1; background: #252825; border-color: #676c63; }
+button:not(:disabled):hover, summary:hover { text-decoration: underline; text-underline-offset: 5px; }
+:is(button, a, summary, input, textarea, select):focus-visible { outline: 3px solid #ffe1a1; outline-offset: 4px; }
+.tabs button[aria-selected="true"], nav a.current { color: #fff5df; border-bottom-width: 3px; }
+.muted, .measurement, .chart-caption, .bit-label, .policy-note, .backend-status { color: var(--accessible-muted); }
+.bar-row > span, .legend-item, .design-legend small, .performance-summary small { font-size: 15px; }
+.bar-track { background: #30362f; }
+.state-cell { border-color: #777e72; }
+.hex-output { background: #1b1e1b; color: #f4f0e7; border-color: #777e72; }
+.reading-note { color: #f0d999; border-color: #dfc276; }
+.connection-dot.connected { background: #a1e4b5; width: 8px; height: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
