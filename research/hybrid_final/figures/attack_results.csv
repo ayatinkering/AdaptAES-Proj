@@ -1,0 +1,6 @@
+design,trials,key_recoveries_by_this_attack,mean_attack_seconds,mean_surviving_guesses_after_1024_queries
+AES-4,20,20,0.189,16
+AES-4 + ARX,20,0,0.196,0
+AES-5,20,0,0.217,0
+AES-6,20,0,0.246,0
+AES-10,20,0,0.371,0

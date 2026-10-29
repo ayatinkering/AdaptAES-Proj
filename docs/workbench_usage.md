@@ -1,0 +1,89 @@
+# AdaptAES cipher workbench
+
+The interface uses the final teammate archive preserved byte-for-byte in
+`research/hybrid_final/`. `SOURCE_MANIFEST.json` records every original file's
+SHA-256. Original experiments, figures, and CSVs can still be run/read separately.
+The UI's source viewer shows those exact files, not the API adapters.
+
+## Start locally
+
+Requirements: Python 3.10+, Node.js 22+, npm. The server has no Python dependencies.
+
+```bash
+cd web
+npm install
+npm run build
+cd ..
+python3 -m api.server
+```
+
+Open http://127.0.0.1:8000 . Change the port with `--port 8001`.
+For frontend edits, run `npm run dev` inside `web` to watch/rebuild, keep the Python
+server running, then refresh the browser. No separate development origin is used.
+
+The planned FastAPI/Vite stack was simplified to React + esbuild and Python's
+standard-library HTTP server because package network access was unavailable during
+implementation. It has no database, account, external API, or model dependency.
+Frontend packages are pinned; the Departure Mono font is self-hosted with its license.
+This is a loopback-only local classroom app, not a production hosting configuration.
+
+## Screens
+
+- **Workbench:** arbitrary UTF-8 text or binary files up to 64 KiB, exact boundary
+  samples, original/adaptive hybrid/fixed cipher selection, encryption/decryption,
+  raw downloads, verified selected-block state trace, ARX word view, and bit-flip
+  diffusion. Matched comparison is limited to 4 KiB and five repeats after warm-up.
+- **Analysis:** supplied recorded integral/differential/linear/block-substitution
+  evidence and bounded local experiments (one to three trials). Local jobs run in
+  a separate process, can be cancelled, and have a 180-second polling timeout.
+- **Research:** separate padded and raw-block timing collections, original CSVs,
+  full exact source viewer, evidence index, and original study context/report.
+
+The new adaptive hybrid adapter applies the exact fixed hybrid only to 1–128 byte
+payloads, retaining original AES-6/8/10 above that. This wiring is new; the archive's
+`aes_hybrid.py` itself always runs four rounds plus ARX.
+
+## Measurement and interpretation
+
+Input/key bytes and payload contents are not logged or persisted. Job results live
+in memory until process shutdown or eviction; explicit user exports create files.
+Single-run Python timings exclude trace and diffusion collection; trace state
+outputs are checked against the exact supplied cipher output. Comparisons include
+padding and key expansion consistently. These are educational implementation times,
+not optimized AES-library or end-to-end network measurements.
+
+The integral live adapter compiles only `square_attack` and `original_key` from
+`evaluate_hybrid.py`, avoiding the script's import-time plotting/benchmark loops.
+It performs actual AES-4 master-key verification. Other designs report candidate
+filtering, not hardcoded key-recovery failures. The differential and linear quick
+adapters use the supplied formulas with 256 samples per key (recorded runs use
+2,048); they are explicitly separate observations. They do not invent a null
+reference or security rating for a live run.
+
+Block substitution succeeds in the supplied unauthenticated wrappers, including
+AES-10. The UI reports this accurately. Meet-in-the-middle and related-key attacks
+are Not run. Failure of one integral equation is not universal attack resistance.
+The original report's 61.11% category saving and 0.88% aggregate saving are historical
+values, not hybrid measurements; old raw timing artifacts need reconciliation.
+
+## Tests
+
+```bash
+PYTHONPATH=src:. python3 -m unittest discover -s tests -v
+```
+
+Tests cover archive integrity, AES known vectors, adaptive thresholds, hybrid
+inversion, binary round trips, actual cipher/trace equivalence, integral key recovery,
+block substitution, and source provenance. Long full research runs are not needed
+for each regression check. Supplied standalone plotting/probe scripts additionally
+require matplotlib and, for the supplied linear script, numpy.
+
+## Demo sequence
+
+1. Encrypt a short message and inspect the actual ARX state.
+2. Choose the 128/129-byte presets to explain round selection.
+3. Flip an input bit and inspect the changed output bits.
+4. Run one integral trial; inspect exact recovery versus candidate elimination.
+5. Compare recorded differential and linear observations with random references.
+6. Show block substitution as a wrapper-level issue.
+7. Open Research and compare hybrid with AES-5 and AES-10 within one timing method.

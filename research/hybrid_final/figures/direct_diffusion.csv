@@ -1,0 +1,4 @@
+design,pairs,mean_changed_bits,std_changed_bits,min_changed_bits,max_changed_bits
+AES-4,1500,63.939,5.551,46,81
+AES-4 + ARX,1500,64.041,5.675,41,84
+AES-5,1500,64.061,5.652,45,84

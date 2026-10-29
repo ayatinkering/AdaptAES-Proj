@@ -1,0 +1,9 @@
+Test,Conditions,4-round + ARX,5-round AES,10-round AES,Meaning
+Integral key recovery,"20 keys; 1,024 chosen blocks/key",0/20,0/20,0/20,No recovery by this attack
+Differential pattern probe,"8 keys; 2,048 chosen pairs/key",20.00,19.88,19.75,Largest repeated output-byte difference; random reference 20.14
+Linear bit-correlation probe,"4 keys; 2,048 plaintexts/key",0.0833,0.0837,0.0762,Largest absolute input/output bit correlation; random reference 0.0798
+ARX-middle integral trace,10 sets of 256 blocks,0 of 16 balanced bytes after ARX,N/A,N/A,Explains failure of original integral equation; white-box diagnostic
+Meet-in-the-middle key recovery,Not attempted,Not tested,Not tested,Not tested,Requires a separate attack design and resource estimate
+Related-key attack,Not attempted,Not tested,Not tested,Not tested,Different threat model; not warranted by current interface
+"Pure-Python runtime, 256-byte message","7 repetitions; median, prior test",2.059 ms,2.471 ms,5.045 ms,"Implementation-specific, not network latency"
+Active attacker: replace encrypted block,100 messages per configuration,100/100 changed messages accepted,100/100 changed messages accepted,100/100 changed messages accepted,Wrapper has no integrity check; same flaw in every cipher version
