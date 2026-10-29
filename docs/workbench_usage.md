@@ -121,3 +121,32 @@ Vercel adapter returns bounded experiments in the initiating request; it never
 relies on in-memory job polling across function instances. Local jobs retain
 process isolation and cancellation. Hosted bounded runs display a running state
 and return on completion. Timings always refer to the machine running the API.
+
+## Two-screen presentation
+
+The primary interface now has only two destinations:
+
+1. **Encryption & comparison:** enter text or a file (up to 4 KiB), select an
+   exact payload-size preset, and run all eight configurations together. The
+   table includes rounds, ARX allocation, median encryption/decryption time,
+   throughput, speedup and exact recovery. Statistical comparison uses eight
+   plaintext-bit and eight key-bit flips on the first padded block; entropy is
+   averaged independently over 16-byte ciphertext blocks. Inspect any row to see
+   that cipher's actual first-block transformations and slowed visual replay.
+2. **Attack lab:** integral, differential, linear and block substitution run
+   against AES-4, AES-4 + ARX, AES-5, AES-6, AES-8 and AES-10. The integral slider
+   replays the actual four-set candidate counts from the completed experiment.
+   Evidence includes chosen-message samples and per-byte surviving guesses. A
+   verified recovered AES-4 master key is used to decrypt a generated AES-10
+   challenge encrypted with the same key, demonstrating key-reuse compromise,
+   not an attack against full-round AES. Substitution shows the original target,
+   attacker replacement and delivered plaintext block.
+
+The two screens retain state when switching. Original traffic-study tables are
+available in a disclosure beneath the comparison. Their exact repository
+aggregate CSVs are copied to `research/report_reference/`, outside the unchanged
+teammate archive. They are separate from live runs and from the fixed hybrid's
+recorded measurements. The archived round-wise sample counts sum to 90,000.
+
+Restart the Python server after updating backend files. A frontend version guard
+reports an old comparison API instead of rendering incomplete timing/statistics.

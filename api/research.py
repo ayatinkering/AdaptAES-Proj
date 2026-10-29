@@ -157,21 +157,42 @@ def encrypt_request(body):
 
 
 def compare_request(body):
-    data, key, _ = decode_request(body)
-    if len(data) > 4096: raise ValueError('Live comparison is limited to 4,096 bytes.')
-    names = ['aes10', 'adaptive', 'adaptive_arx', 'aes5']
-    samples = {m: [] for m in names}
+    data,key,_=decode_request(body)
+    if len(data)>4096:raise ValueError('Comparison is limited to 4,096 bytes.')
+    names=['aes4','hybrid','aes5','aes6','aes8','aes10','adaptive','adaptive_arx']
+    samples={m:[] for m in names};dec_samples={m:[] for m in names};outputs={}
     for repeat in range(6):
-        for mode in names[repeat % 4:] + names[:repeat % 4]:
-            config = selection(mode, len(data)); config['original_length'] = len(data)
-            start = time.perf_counter_ns(); ct = crypt(data, key, config); elapsed = time.perf_counter_ns()-start
-            if crypt(ct, key, config, True) != data: raise ValueError('Comparison verification failed.')
-            if repeat: samples[mode].append(elapsed)
-    baseline = statistics.median(samples['aes10'])
-    return {'rows': [{'design': MODES[m], 'median_ms': statistics.median(v)/1e6,
-                      'throughput_mib_s': len(data)/2**20/(statistics.median(v)/1e9),
-                      'reduction_percent': (1-statistics.median(v)/baseline)*100} for m,v in samples.items()],
-            'bytes': len(data), 'repeats': 5, 'scope': 'Local padded-message encryption; rotating order; one warm-up'}
+        order=names[repeat%len(names):]+names[:repeat%len(names)]
+        if repeat%2:order=list(reversed(order))
+        for mode in order:
+            config=selection(mode,len(data));config['original_length']=len(data)
+            start=time.perf_counter_ns();ct=crypt(data,key,config);elapsed=time.perf_counter_ns()-start
+            start=time.perf_counter_ns();recovered=crypt(ct,key,config,True);dec_elapsed=time.perf_counter_ns()-start
+            if recovered!=data:raise ValueError('Comparison verification failed.')
+            outputs[mode]=ct
+            if repeat:samples[mode].append(elapsed);dec_samples[mode].append(dec_elapsed)
+    baseline=statistics.median(samples['aes10']);rows=[];block=aes.pad_data(data)[:16]
+    for mode in names:
+        config=selection(mode,len(data));fn=block_functions(config,key)[0];cipher=fn(block);plain_ae=[];key_ae=[]
+        for bit in range(8):
+            changed=bytearray(block);changed[bit//8]^=1<<(bit%8)
+            plain_ae.append(sum((a^b).bit_count() for a,b in zip(cipher,fn(bytes(changed))))/128*100)
+            changed_key=bytearray(key);changed_key[bit//8]^=1<<(bit%8)
+            key_ct=block_functions(config,bytes(changed_key))[0](block)
+            key_ae.append(sum((a^b).bit_count() for a,b in zip(cipher,key_ct))/128*100)
+        ct=outputs[mode];entropies=[]
+        for offset in range(0,len(ct),16):
+            counts=Counter(ct[offset:offset+16]);entropies.append(-sum((v/16)*math.log2(v/16) for v in counts.values()))
+        enc_ms=statistics.median(samples[mode])/1e6;dec_ms=statistics.median(dec_samples[mode])/1e6
+        rows.append({'design':MODES[mode],'mode':mode,'rounds':config['rounds'],'arx':config['arx'],
+                     'median_ms':enc_ms,'decryption_ms':dec_ms,'throughput_mib_s':len(data)/2**20/(enc_ms/1000),
+                     'decryption_mib_s':len(data)/2**20/(dec_ms/1000),'speedup':baseline/(enc_ms*1e6),
+                     'reduction_percent':(1-enc_ms*1e6/baseline)*100,'verified':True,
+                     'plaintext_avalanche_percent':statistics.mean(plain_ae),'key_avalanche_percent':statistics.mean(key_ae),
+                     'block_entropy':statistics.mean(entropies),'diffusion_samples':8})
+    return {'rows':rows,'bytes':len(data),'repeats':5,
+            'scope':'Same payload and key; one warm-up and five timed runs; rotating order; medians. Padding and key expansion included. Encryption and decryption timed separately; round-trip verified.',
+            'statistical_scope':'Eight single-bit plaintext flips and eight single-bit key flips on the first padded block. Entropy averaged over individual 16-byte ciphertext blocks (empirical maximum 4 bits/byte). Statistical indicators, not attack resistance.'}
 
 
 def recorded():
@@ -179,7 +200,10 @@ def recorded():
     for path in sorted(SOURCE.rglob('*.csv')):
         with path.open(newline='') as handle: rows = list(csv.DictReader(handle))
         catalog[str(path.relative_to(SOURCE))] = rows
-    return {'archive': MANIFEST['archive'], 'sha256': MANIFEST['sha256'], 'datasets': catalog,
+    study={}
+    for path in sorted((ROOT/'research/report_reference').glob('*.csv')):
+        with path.open(newline='') as handle:study[path.name]=list(csv.DictReader(handle))
+    return {'original_study':study,'archive': MANIFEST['archive'], 'sha256': MANIFEST['sha256'], 'datasets': catalog,
             'files': list(MANIFEST['files']), 'environment': 'Not recorded in supplied archive'}
 
 
@@ -190,7 +214,7 @@ def experiments(kind, seed, trials, emit):
     definitions with reduced live sample budgets, explicitly returned in results.
     """
     rng = random.Random(seed)
-    configs = [('AES-4',4,False),('AES-4 + ARX',4,True),('AES-5',5,False),('AES-10',10,False)]
+    configs = [('AES-4',4,False),('AES-4 + ARX',4,True),('AES-5',5,False),('AES-6',6,False),('AES-8',8,False),('AES-10',10,False)]
     rows = []
     for design, rounds, arx in configs:
         curves=[]; successes=0; per_trial=[]; biases=[]; linear=[]; counts=[]
@@ -200,14 +224,28 @@ def experiments(kind, seed, trials, emit):
             dec = (lambda b: hybrid.decrypt_block(b,key)) if arx else (lambda b: aes.decrypt_block(b,key,rounds))
             if kind=='integral':
                 _attack_globals['RNG'] = rng
-                survivors, curve = _attack_globals['square_attack'](lambda b,k: enc(b), key)
+                oracle_samples=[]
+                def oracle(b,k):
+                    ct=enc(b)
+                    if len(oracle_samples)<2:oracle_samples.append({'plaintext':b.hex(),'ciphertext':ct.hex()})
+                    return ct
+                survivors, curve = _attack_globals['square_attack'](oracle, key)
                 curves.append(curve)
                 verified=False
                 if design=='AES-4' and all(len(s)==1 for s in survivors):
                     recovered=_attack_globals['original_key'](bytes(next(iter(s)) for s in survivors))
                     verified=recovered==key
                 successes+=verified
-                per_trial.append({'trial':trial+1,'candidates':[len(s) for s in survivors], 'verified_master_key_recovered': verified if design=='AES-4' else None})
+                proof={}
+                if design=='AES-4' and verified:
+                    challenge=b'AdaptAES laboratory challenge'
+                    sealed=aes.encrypt_data(challenge,key)
+                    unsealed=aes.decrypt_data(sealed,recovered)
+                    proof={'lab_master_key':key.hex(),'recovered_master_key':recovered.hex(),
+                           'aes10_ciphertext':sealed.hex(),'aes10_recovered_text':unsealed.decode(),
+                           'aes10_challenge_verified':unsealed==challenge}
+                per_trial.append({'trial':trial+1,'candidates':[len(s) for s in survivors],
+                                  'verified_master_key_recovered': verified if design=='AES-4' else None,'oracle_samples':oracle_samples,'candidate_curve':curve,**proof})
             elif kind=='substitution':
                 a,b=rng.randbytes(32),rng.randbytes(32)
                 def seal(p):
@@ -237,8 +275,8 @@ def experiments(kind, seed, trials, emit):
                     for j in range(128):cy[j]|=((c[j//8]>>(7-j%8))&1)<<i
                 linear.append(max(abs(1-2*(x^y).bit_count()/n) for x in px for y in cy))
             else: raise ValueError('Unsupported experiment.')
-            emit({'completed':len(rows)*trials+trial+1,'total':4*trials,'design':design})
-        entry={'design':design,'trials':trials}
+            emit({'completed':len(rows)*trials+trial+1,'total':len(configs)*trials,'design':design})
+        entry={'design':design,'rounds':rounds,'arx':arx,'trials':trials}
         if kind=='integral':entry.update(curve=[statistics.mean(c[i] for c in curves) for i in range(4)],
                                          queries_per_trial=1024, verified_recoveries=successes if design=='AES-4' else None,
                                          final_candidates=statistics.mean(c[-1] for c in curves), details=per_trial)

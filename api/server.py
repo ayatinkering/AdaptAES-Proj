@@ -35,7 +35,7 @@ def start_job(body):
         if len(JOBS)>=20:
             oldest=next(iter(JOBS));JOBS.pop(oldest)
         ident=uuid.uuid4().hex;ctx=mp.get_context('spawn');q=ctx.Queue();p=ctx.Process(target=worker,args=(q,kind,seed,trials),daemon=True)
-        JOBS[ident]={'state':'running','completed':0,'total':trials*4,'process':p,'queue':q,'started':time.monotonic()}
+        JOBS[ident]={'state':'running','completed':0,'total':trials*6,'process':p,'queue':q,'started':time.monotonic()}
         p.start()
     return {'id':ident}
 

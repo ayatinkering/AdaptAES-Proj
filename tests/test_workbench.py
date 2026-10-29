@@ -52,6 +52,26 @@ class WorkbenchTests(unittest.TestCase):
         for body in ({'sizes':[]},{'sizes':[1]*13},{'sizes':[4097]},{'sizes':[1.5]},{'sizes':[True]},{'sizes':[1],'seed':-1}):
             with self.assertRaises(ValueError):research.stream_request(body)
 
+    def test_all_round_comparison_has_real_decryption_and_statistics(self):
+        r=research.compare_request(self.body(b'Information security lab'))
+        self.assertEqual({row['mode'] for row in r['rows']},{'aes4','hybrid','aes5','aes6','aes8','aes10','adaptive','adaptive_arx'})
+        baseline=next(row for row in r['rows'] if row['mode']=='aes10')
+        for row in r['rows']:
+            self.assertTrue(row['verified'])
+            self.assertGreater(row['decryption_ms'],0)
+            self.assertAlmostEqual(row['speedup'],baseline['median_ms']/row['median_ms'])
+            self.assertTrue(0<=row['plaintext_avalanche_percent']<=100)
+            self.assertTrue(0<=row['key_avalanche_percent']<=100)
+            self.assertTrue(0<=row['block_entropy']<=4)
+
+    def test_report_reference_contains_original_round_statistics(self):
+        r=research.recorded()['original_study']
+        rows=r['roundwise_security_summary.csv']
+        self.assertEqual([int(row['rounds']) for row in rows],[4,6,8,10])
+        self.assertEqual(sum(int(row['sample_count']) for row in rows),90000)
+        small=next(row for row in r['bucket_security_performance_summary.csv'] if row['mode']=='adaptaes' and row['payload_bucket']=='1-128')
+        self.assertAlmostEqual(float(small['mean_encryption_time_ns'])/1e6,.6005300943396227)
+
     def test_reject_bad_inputs(self):
         for body in (self.body(b''),self.body(b'x',mode='unknown'),self.body(b'x',block=2),self.body(b'x',bit=128),{'data':'invalid','key':'123'}):
             with self.assertRaises(ValueError):research.encrypt_request(body)
@@ -60,6 +80,11 @@ class WorkbenchTests(unittest.TestCase):
         progress=[]
         r=research.experiments('integral',20261029,1,progress.append)
         self.assertEqual(r['rows'][0]['verified_recoveries'],1)
+        detail=r['rows'][0]['details'][0]
+        self.assertEqual(detail['lab_master_key'],detail['recovered_master_key'])
+        self.assertTrue(detail['aes10_challenge_verified'])
+        self.assertEqual(len(detail['oracle_samples']),2)
+        self.assertEqual(len(r['rows']),6)
         self.assertEqual(r['rows'][0]['final_candidates'],16)
         self.assertEqual(r['rows'][1]['final_candidates'],0)
         self.assertIsNone(r['rows'][1]['verified_recoveries'])

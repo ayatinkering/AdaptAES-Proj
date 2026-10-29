@@ -30,7 +30,7 @@ class handler(Handler):
             # Keep the supplied attack function's RNG binding isolated within an instance.
             with _EXPERIMENT_LOCK:
                 result = research.experiments(kind, seed, trials, lambda _: None)
-            self.respond({'state': 'done', 'completed': 4*trials, 'total': 4*trials, 'result': result})
+            self.respond({'state': 'done', 'completed': 6*trials, 'total': 6*trials, 'result': result})
         except (ValueError, TypeError, KeyError, OverflowError) as exc:
             self.respond({'error': str(exc)}, 400)
         except Exception:
