@@ -770,8 +770,8 @@ body {
   color: #553490;
 }
 .demo-policy > div.selected {
-  outline: 2px solid #172339;
-  outline-offset: 2px;
+  outline: none;
+  border-color: currentColor;
 }
 .demo-note {
   color: #3f536d !important;
@@ -790,7 +790,7 @@ body {
 .demo-empty {
   background: #e6effb;
   color: #253e5d;
-  border-left: 4px solid #4184d9;
+  border-left: 0;
 }
 .demo-metric-controls button,
 .demo-attack-tabs button {
@@ -873,7 +873,7 @@ body {
 }
 .demo-arx {
   background: #fff0d9;
-  border-left: 4px solid #d17a18;
+  border-left: 0;
 }
 .demo-hex {
   background: #e2f5ea;
@@ -882,19 +882,19 @@ body {
 }
 .demo-attack-intro {
   background: #e5efff;
-  border-left: 5px solid #3073cc;
+  border-left: 0;
 }
 .demo-attack-tabs button:nth-child(1) {
-  border-bottom: 4px solid #3278ce;
+  border-bottom: 1px solid #8aa0bd;
 }
 .demo-attack-tabs button:nth-child(2) {
-  border-bottom: 4px solid #d27b17;
+  border-bottom: 1px solid #8aa0bd;
 }
 .demo-attack-tabs button:nth-child(3) {
-  border-bottom: 4px solid #427c5b;
+  border-bottom: 1px solid #8aa0bd;
 }
 .demo-attack-tabs button:nth-child(4) {
-  border-bottom: 4px solid #c23b46;
+  border-bottom: 1px solid #8aa0bd;
 }
 .demo-attack-steps > div {
   padding: 20px;
@@ -1003,13 +1003,13 @@ body {
   background: #dceaff;
   color: #174d91;
   padding: 14px;
-  border-left: 4px solid #4b8bd9;
+  border-left: 0;
 }
 .flow-arx {
   grid-column: 1/-1;
   background: #ffdfb4;
   color: #773c00;
-  border-left: 4px solid #d27b17;
+  border-left: 0;
   padding: 16px;
 }
 .flow-output {
@@ -1091,7 +1091,7 @@ body {
   color: #473983;
 }
 .flow-input {
-  border-left: 4px solid #2868d6;
+  border-left: 0;
 }
 .message-flow .flow-key {
   background: #e6e9fc;
@@ -1106,7 +1106,7 @@ body {
   border-color: #d78a23;
 }
 .flow-output {
-  border-left: 4px solid #168c79;
+  border-left: 0;
 }
 .performance-repeat {
   display: flex;

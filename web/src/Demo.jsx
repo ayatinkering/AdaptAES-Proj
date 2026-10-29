@@ -758,7 +758,6 @@ function EncryptionScreen({ catalog, onAttacks }) {
     <>
       <div className="demo-title">
         <h1>Encrypt and compare</h1>
-        <p>One input. All round counts. The same key and measurement method.</p>
       </div>
       <section className="demo-input">
         <div>
@@ -834,7 +833,7 @@ function EncryptionScreen({ catalog, onAttacks }) {
         </div>
         <div className="demo-selection">
           <h2>{chosen(size || 1)}</h2>
-          <p>Selected automatically for {fmt(size, 0)} bytes.</p>
+
           <div className="demo-policy">
             {[
               ["1–128 B", "4 + ARX"],
@@ -1206,10 +1205,6 @@ function AttacksScreen({ catalog }) {
     <>
       <div className="demo-title">
         <h1>Attack lab</h1>
-        <p>
-          Run a real experiment, follow the evidence, and compare cipher
-          outcomes.
-        </p>
       </div>
       <div className="demo-attack-tabs">
         {Object.entries(descriptions).map(([id, d]) => (
