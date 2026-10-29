@@ -2734,3 +2734,6 @@ button:not(:disabled):hover, summary:hover { text-decoration: underline; text-un
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.trace-controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.trace-controls button:first-child { width: auto; min-width: 170px; padding: 10px 14px; white-space: nowrap; }
+.state-heading { flex-wrap: wrap; gap: 18px; }
