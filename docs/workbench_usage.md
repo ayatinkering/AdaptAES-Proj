@@ -87,3 +87,37 @@ require matplotlib and, for the supplied linear script, numpy.
 5. Compare recorded differential and linear observations with random references.
 6. Show block substitution as a wrapper-level issue.
 7. Open Research and compare hybrid with AES-5 and AES-10 within one timing method.
+
+## Interactive lab upgrade
+
+Home now runs the real cipher for a selected generated payload and displays
+archived highlights directly from their CSV datasets. Workbench includes a payload
+slider, backend-verified transformation replay, per-operation bit diffusion, and
+packet-stream comparison. Analysis groups attack runs, payload-size measurements,
+and session history. Research adds architecture, policy and measurement definitions.
+
+`POST /api/stream` accepts `sizes` (1–12 integer byte counts, each 1–4096) and a
+32-bit unsigned integer `seed`. It generates deterministic byte payloads and a
+shared key. Each packet runs AdaptAES–ARX and AES-10 with alternating order, one
+warm-up and three measured encryptions; every decryption is checked outside the
+timer. Aggregate latency sums packet medians; aggregate throughput divides total
+payload bytes by that sum. This is a synthetic workload, not captured traffic or
+an end-to-end network benchmark. API timing measures the server, not the browser.
+
+The encryption API also returns `diffusion.stages`: changed bits at each actual
+intermediate state after one plaintext-bit flip, checked against the final count.
+
+Up to 40 completed run summaries are saved in browser `sessionStorage` for the
+current tab. No plaintext, ciphertext, raw attack details or keys are retained in
+history. CSV exports include the displayed measurements; session CSV includes run
+conditions. Clear history removes those summaries. The previous statement that no
+results are stored refers to server persistence, not this new tab-local history.
+
+## Vercel deployment
+
+Deploy the repository root, not only `web/`: `vercel.json` builds the React app
+and one Python function containing the exact archived research modules. The
+Vercel adapter returns bounded experiments in the initiating request; it never
+relies on in-memory job polling across function instances. Local jobs retain
+process isolation and cancellation. Hosted bounded runs display a running state
+and return on completion. Timings always refer to the machine running the API.

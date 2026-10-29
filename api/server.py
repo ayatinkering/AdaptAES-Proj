@@ -95,6 +95,7 @@ class Handler(BaseHTTPRequestHandler):
             body=json.loads(self.rfile.read(size))
             if not isinstance(body,dict):raise ValueError('Send a JSON object.')
             if self.path=='/api/encrypt':return self.respond(research.encrypt_request(body))
+            if self.path=='/api/stream':return self.respond(research.stream_request(body))
             if self.path=='/api/compare':return self.respond(research.compare_request(body))
             if self.path=='/api/experiments':return self.respond(start_job(body),202)
             self.send_error(404)

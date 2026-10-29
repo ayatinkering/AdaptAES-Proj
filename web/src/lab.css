@@ -1,0 +1,386 @@
+/* Functional lab components: neutral structure, colour on real data. */
+.home-encryption {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr;
+  gap: 40px;
+  padding: 28px;
+  background: #111;
+}
+.home-encryption h2,
+.lab-section-heading h2,
+.home-evidence h2,
+.architecture-lab h2 {
+  font-size: 24px;
+}
+.home-pipeline {
+  min-width: 0;
+}
+.pipeline-flow,
+.architecture-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  overflow-x: auto;
+  margin: 24px 0;
+  padding-bottom: 12px;
+}
+.pipeline-flow > span,
+.architecture-flow > span {
+  padding: 14px;
+  background: #202020;
+  min-width: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.pipeline-flow small,
+.architecture-flow small {
+  display: block;
+  font-size: 12px;
+  white-space: normal;
+  margin-top: 6px;
+}
+.pipeline-flow .arx-node {
+  color: #ffad5c;
+  border-bottom: 2px solid #ffad5c;
+}
+.packet-selector {
+  margin: 20px 0;
+}
+.packet-selector > label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  gap: 12px;
+}
+.packet-selector input[type="range"] {
+  width: 100%;
+  margin: 16px 0;
+  accent-color: #67b7ff;
+  min-height: 30px;
+}
+.policy-bands {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.policy-bands button {
+  padding: 12px 8px;
+  border: 1px solid #555;
+  color: #fff;
+  background: #151515;
+  font-size: 14px;
+  min-height: 62px;
+}
+.policy-bands button.selected {
+  background: #303030;
+  border-color: #fff;
+}
+.policy-bands small {
+  display: block;
+  font-size: 11px;
+  margin-top: 5px;
+}
+.home-run-values,
+.stream-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 24px 0;
+  font-size: 15px;
+}
+.home-run-values strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 400;
+}
+.home-cipher {
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 16px 0;
+}
+.verified-text {
+  color: #57f49a;
+}
+.lab-note {
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 85ch;
+  margin: 14px 0;
+  color: #e4e4e4;
+}
+.home-evidence,
+.stream-lab,
+.history-lab,
+.architecture-lab,
+.diffusion-rounds {
+  margin: 40px 0;
+}
+.evidence-lines {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin: 24px 0;
+}
+.evidence-lines > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.evidence-lines strong {
+  font-size: 32px;
+  font-weight: 400;
+}
+.evidence-lines small {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.evidence-lines > div:first-child strong {
+  color: #67b7ff;
+}
+.evidence-lines > div:nth-child(2) strong {
+  color: #ff7474;
+}
+.evidence-lines > div:nth-child(3) strong {
+  color: #57f49a;
+}
+.lab-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.lab-section-heading > div {
+  display: flex;
+  gap: 20px;
+}
+.stream-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px auto;
+  gap: 20px;
+  align-items: center;
+  margin: 24px 0;
+}
+.stream-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+}
+.stream-controls input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #777;
+}
+.stream-controls small {
+  font-size: 12px;
+}
+.stream-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.stream-summary b {
+  display: block;
+  font-size: 26px;
+  font-weight: 400;
+}
+.chart-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+  font-size: 14px;
+}
+.chart-control select {
+  padding: 10px;
+  margin-left: 12px;
+}
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 8px 0 16px;
+}
+.adaptive {
+  background: #57f49a;
+}
+.standard {
+  background: #67b7ff;
+}
+.packet-chart-row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 0;
+}
+.packet-chart-row > span {
+  font-size: 15px;
+}
+.packet-chart-row small {
+  display: block;
+  font-size: 12px;
+}
+.packet-bar-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 125px;
+  gap: 14px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 13px;
+}
+.packet-bar-line > span {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.packet-bar-track {
+  height: 12px;
+  background: #222;
+}
+.packet-bar {
+  height: 12px;
+}
+.packet-chart-row > strong {
+  font-size: 20px;
+  text-align: right;
+  font-weight: 400;
+}
+.history-list details {
+  padding: 20px 0;
+  border-bottom: 1px solid #333;
+}
+.history-list summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.history-list pre {
+  max-height: 300px;
+  overflow: auto;
+  font-size: 13px;
+}
+.architecture-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 28px;
+}
+.architecture-columns h3 {
+  font-size: 20px;
+  margin: 16px 0;
+}
+.architecture-columns p,
+.architecture-columns dl {
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+.architecture-columns dd {
+  margin: 0 0 14px;
+}
+.architecture-columns table {
+  width: 100%;
+}
+.architecture-columns td,
+.architecture-columns th {
+  padding: 14px 8px;
+}
+.diffusion-rounds > div {
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr) 100px;
+  align-items: center;
+  gap: 20px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.diffusion-track {
+  height: 12px;
+  background: #252525;
+}
+.diffusion-track span {
+  display: block;
+  height: 100%;
+  background: #ffad5c;
+}
+.diffusion-rounds strong {
+  font-weight: 400;
+  text-align: right;
+}
+.lab-page-tabs {
+  margin-top: 24px;
+}
+@media (max-width: 1000px) {
+  .home-encryption {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .stream-controls {
+    grid-template-columns: 1fr 170px;
+  }
+  .stream-controls > button {
+    justify-self: start;
+  }
+  nav {
+    gap: 6px;
+  }
+  .backend-status {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .home-encryption {
+    padding: 20px;
+  }
+  .architecture-columns,
+  .evidence-lines {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .stream-controls {
+    grid-template-columns: 1fr;
+  }
+  .packet-chart-row {
+    grid-template-columns: 1fr 70px;
+    gap: 10px;
+  }
+  .packet-chart-row > span {
+    grid-column: 1/-1;
+  }
+  .packet-bar-line {
+    grid-template-columns: minmax(0, 1fr) 105px;
+  }
+  .diffusion-rounds > div {
+    grid-template-columns: minmax(0, 1fr) 90px;
+    gap: 10px;
+  }
+  .diffusion-rounds > div > span {
+    grid-column: 1/-1;
+  }
+  .history-list summary {
+    flex-wrap: wrap;
+  }
+  .policy-bands {
+    grid-template-columns: 1fr 1fr;
+  }
+  nav a {
+    font-size: 13px;
+    padding: 8px;
+  }
+  .wordmark {
+    font-size: 20px;
+  }
+}
+.pipeline-flow > span, .architecture-flow > span { flex: 0 0 auto; }
+.pipeline-flow { flex-wrap: wrap; overflow: visible; }
+.pipeline-flow > span { font-size: 14px; min-height: 64px; padding: 12px; }

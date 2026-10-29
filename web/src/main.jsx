@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
+import { request as api, exportCsv } from "./lab-data";
+import {
+  Home,
+  PacketSelector,
+  StreamLab,
+  RunHistory,
+  Architecture,
+  DiffusionRounds,
+} from "./Lab";
+import "./lab.css";
 
 const encoder = new TextEncoder();
 const MODES = [
@@ -29,24 +39,6 @@ const CSV_MAP = {
   linear: "figures/linear_probe.csv",
   substitution: "figures/active_attacker_results.csv",
 };
-async function api(path, body, method) {
-  const response = await fetch(
-    "/api/" + path,
-    body
-      ? {
-          method: method || "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      : method
-        ? { method }
-        : {},
-  );
-  const data = await response.json();
-  if (!response.ok)
-    throw Error(data.error || "Could not complete the request.");
-  return data;
-}
 const hex = (bytes) =>
   Array.from(bytes, (x) => x.toString(16).padStart(2, "0")).join("");
 const b64 = (bytes) => {
@@ -651,6 +643,11 @@ function Workspace({ openSource, onAnalyze }) {
               Clear
             </button>
           </div>
+          <PacketSelector
+            disabled={busy}
+            size={size}
+            onChange={(n) => preset(n)}
+          />
           <div className="thresholds">
             <span>Test a boundary</span>
             <div>
@@ -1144,6 +1141,8 @@ function Workspace({ openSource, onAnalyze }) {
           </div>
         </section>
       )}
+      <DiffusionRounds stages={result?.diffusion?.stages} />
+      <StreamLab />
       <div className="next-section">
         <p></p>
         <button className="text-button" onClick={onAnalyze}>
@@ -1191,7 +1190,54 @@ function DataTable({ rows }) {
   );
 }
 
-function Analysis({ catalog, openSource }) {
+function Analysis(props) {
+  const [section, setSection] = useState("attacks");
+  return (
+    <>
+      <div
+        className="tabs lab-page-tabs"
+        role="tablist"
+        aria-label="Analysis view"
+      >
+        {[
+          ["attacks", "Attack experiments"],
+          ["performance", "Packet performance"],
+          ["history", "Run history"],
+        ].map(([id, name]) => (
+          <button
+            role="tab"
+            aria-selected={section === id}
+            key={id}
+            className={section === id ? "active" : ""}
+            onClick={() => setSection(id)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+      {section === "attacks" ? (
+        <AttackAnalysis {...props} />
+      ) : section === "performance" ? (
+        <>
+          <div className="page-heading">
+            <div>
+              <h1>Packet performance</h1>
+              <p>
+                Compare the adaptive policy and AES-10 across payload sizes.
+              </p>
+            </div>
+          </div>
+          <StreamLab title="Payload-size comparison" />
+          <RunHistory />
+        </>
+      ) : (
+        <RunHistory />
+      )}
+    </>
+  );
+}
+
+function AttackAnalysis({ catalog, openSource }) {
   const [kind, setKind] = useState("integral"),
     [view, setView] = useState("recorded"),
     [job, setJob] = useState(null),
@@ -1235,8 +1281,13 @@ function Analysis({ catalog, openSource }) {
         seed: Number(seed),
         trials: Number(trials),
       });
-      setJob(j.id);
-      setRun({ state: "running", completed: 0, total: 4 * trials });
+      if (j.state === "done") {
+        setRun(j);
+        setJob(null);
+      } else {
+        setJob(j.id);
+        setRun({ state: "running", completed: 0, total: 4 * trials });
+      }
     } catch (e) {
       setError(e.message);
     } finally {
@@ -1301,6 +1352,19 @@ function Analysis({ catalog, openSource }) {
         ))}
       </div>
       <DemoGuide analysis />
+      {result && (
+        <button
+          className="secondary"
+          onClick={() =>
+            exportCsv(
+              "adaptaes-" + kind + ".csv",
+              result.rows.map(({ details, curve, ...row }) => row),
+            )
+          }
+        >
+          Export live results CSV
+        </button>
+      )}
       <section className="experiment">
         <div className="experiment-heading">
           <h2>{TITLES[kind]}</h2>
@@ -1363,7 +1427,7 @@ function Analysis({ catalog, openSource }) {
                 onClick={start}
               >
                 {starting
-                  ? "Starting…"
+                  ? "Running experiment…"
                   : job
                     ? "Running experiment…"
                     : "Run experiment"}
@@ -1671,6 +1735,12 @@ function Results({ catalog, openSource }) {
       </div>
       <div className="tabs">
         <button
+          className={section === "architecture" ? "active" : ""}
+          onClick={() => setSection("architecture")}
+        >
+          Architecture & methods
+        </button>
+        <button
           className={section === "performance" ? "active" : ""}
           onClick={() => setSection("performance")}
         >
@@ -1689,7 +1759,9 @@ function Results({ catalog, openSource }) {
           Original study
         </button>
       </div>
-      {section === "performance" ? (
+      {section === "architecture" ? (
+        <Architecture />
+      ) : section === "performance" ? (
         <section className="experiment">
           <div className="experiment-heading">
             <h2>Same-core encryption comparison</h2>
@@ -1903,14 +1975,14 @@ function Results({ catalog, openSource }) {
 }
 
 function App() {
-  const [page, setPage] = useState(location.hash.slice(1) || "encrypt"),
+  const [page, setPage] = useState(location.hash.slice(1) || "home"),
     [catalog, setCatalog] = useState(null),
     [online, setOnline] = useState(null),
     [source, setSource] = useState(null),
     [sourceError, setSourceError] = useState("");
   const dialog = useRef();
   useEffect(() => {
-    const f = () => setPage(location.hash.slice(1) || "encrypt");
+    const f = () => setPage(location.hash.slice(1) || "home");
     window.addEventListener("hashchange", f);
     api("config")
       .then(() => setOnline(true))
@@ -1938,7 +2010,7 @@ function App() {
   return (
     <div className="app-shell">
       <header>
-        <a className="wordmark" href="#encrypt" aria-label="AdaptAES home">
+        <a className="wordmark" href="#home" aria-label="AdaptAES home">
           <svg width="29" height="29" viewBox="0 0 32 32" aria-hidden="true">
             <path d="M5 26V12L16 4l11 8v14M5 19h22M11 26V11M21 26V11" />
           </svg>
@@ -1946,6 +2018,7 @@ function App() {
         </a>
         <nav aria-label="Main navigation">
           {[
+            ["home", "Home"],
             ["encrypt", "Workbench"],
             ["analyze", "Analysis"],
             ["results", "Research"],
@@ -1973,7 +2046,9 @@ function App() {
       </header>
       <main>
         <ErrorLine error={sourceError} />
-        {page === "analyze" ? (
+        {page === "home" ? (
+          <Home catalog={catalog} go={go} />
+        ) : page === "analyze" ? (
           <Analysis catalog={catalog} openSource={openSource} />
         ) : page === "results" ? (
           <Results catalog={catalog} openSource={openSource} />
@@ -1993,7 +2068,7 @@ function App() {
           Source & methodology ↗
         </button>
         <span className="footer-note">
-          Local research prototype. No data is saved.
+          Research prototype. Run summaries stay in this tab.
         </span>
       </footer>
       <dialog

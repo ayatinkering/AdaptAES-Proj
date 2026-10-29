@@ -30,6 +30,28 @@ class WorkbenchTests(unittest.TestCase):
         self.assertEqual(r['trace'][-1]['hex'],r['ciphertext'][32:64])
         self.assertEqual(r['diffusion']['percent'],r['diffusion']['changed_bits']/128*100)
 
+    def test_diffusion_trace_matches_final_count(self):
+        r=research.encrypt_request(self.body(b'Hello, AdaptAES!'))
+        stages=r['diffusion']['stages']
+        self.assertEqual(stages[0]['changed_bits'],1)
+        self.assertEqual(stages[-1]['changed_bits'],r['diffusion']['changed_bits'])
+        self.assertTrue(any('ARX' in row['name'] for row in stages))
+        self.assertTrue(all(0<=row['changed_bits']<=128 for row in stages))
+
+    def test_packet_stream_policy_and_totals(self):
+        sizes=[128,129,512,513,1024,1025]
+        r=research.stream_request({'sizes':sizes,'seed':42})
+        self.assertEqual([row['rounds'] for row in r['rows']],[4,6,6,8,8,10])
+        self.assertEqual([row['arx'] for row in r['rows']],[True,False,False,False,False,False])
+        self.assertEqual(r['total_bytes'],sum(sizes))
+        self.assertTrue(r['verified'])
+        self.assertAlmostEqual(r['adaptive_total_ms'],sum(row['adaptive_ms'] for row in r['rows']))
+        self.assertAlmostEqual(r['speedup'],r['aes10_total_ms']/r['adaptive_total_ms'])
+
+    def test_packet_stream_rejects_unbounded_work(self):
+        for body in ({'sizes':[]},{'sizes':[1]*13},{'sizes':[4097]},{'sizes':[1.5]},{'sizes':[True]},{'sizes':[1],'seed':-1}):
+            with self.assertRaises(ValueError):research.stream_request(body)
+
     def test_reject_bad_inputs(self):
         for body in (self.body(b''),self.body(b'x',mode='unknown'),self.body(b'x',block=2),self.body(b'x',bit=128),{'data':'invalid','key':'123'}):
             with self.assertRaises(ValueError):research.encrypt_request(body)
