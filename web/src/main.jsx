@@ -1231,7 +1231,12 @@ function Analysis(props) {
           <RunHistory />
         </>
       ) : (
-        <RunHistory />
+        <>
+          <div className="page-heading">
+            <h1>Run history</h1>
+          </div>
+          <RunHistory />
+        </>
       )}
     </>
   );
