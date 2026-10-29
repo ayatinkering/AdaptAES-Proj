@@ -87,3 +87,80 @@ require matplotlib and, for the supplied linear script, numpy.
 5. Compare recorded differential and linear observations with random references.
 6. Show block substitution as a wrapper-level issue.
 7. Open Research and compare hybrid with AES-5 and AES-10 within one timing method.
+
+## Interactive lab upgrade
+
+Home now runs the real cipher for a selected generated payload and displays
+archived highlights directly from their CSV datasets. Workbench includes a payload
+slider, backend-verified transformation replay, per-operation bit diffusion, and
+packet-stream comparison. Analysis groups attack runs, payload-size measurements,
+and session history. Research adds architecture, policy and measurement definitions.
+
+`POST /api/stream` accepts `sizes` (1–12 integer byte counts, each 1–4096) and a
+32-bit unsigned integer `seed`. It generates deterministic byte payloads and a
+shared key. Each packet runs AdaptAES–ARX and AES-10 with alternating order, one
+warm-up and three measured encryptions; every decryption is checked outside the
+timer. Aggregate latency sums packet medians; aggregate throughput divides total
+payload bytes by that sum. This is a synthetic workload, not captured traffic or
+an end-to-end network benchmark. API timing measures the server, not the browser.
+
+The encryption API also returns `diffusion.stages`: changed bits at each actual
+intermediate state after one plaintext-bit flip, checked against the final count.
+
+Up to 40 completed run summaries are saved in browser `sessionStorage` for the
+current tab. No plaintext, ciphertext, raw attack details or keys are retained in
+history. CSV exports include the displayed measurements; session CSV includes run
+conditions. Clear history removes those summaries. The previous statement that no
+results are stored refers to server persistence, not this new tab-local history.
+
+## Vercel deployment
+
+Deploy the repository root, not only `web/`: `vercel.json` builds the React app
+and one Python function containing the exact archived research modules. The
+Vercel adapter returns bounded experiments in the initiating request; it never
+relies on in-memory job polling across function instances. Local jobs retain
+process isolation and cancellation. Hosted bounded runs display a running state
+and return on completion. Timings always refer to the machine running the API.
+
+## Two-screen presentation
+
+The primary interface now has only two destinations:
+
+1. **Encryption & comparison:** enter text or a file (up to 4 KiB), select an
+   exact payload-size preset, and run all eight configurations together. The
+   table includes rounds, ARX allocation, median encryption/decryption time,
+   throughput, speedup and exact recovery. Statistical comparison uses eight
+   plaintext-bit and eight key-bit flips on the first padded block; entropy is
+   averaged independently over 16-byte ciphertext blocks. Inspect any row to see
+   that cipher's actual first-block transformations and slowed visual replay.
+2. **Attack lab:** integral, differential, linear and block substitution run
+   against AES-4, AES-4 + ARX, AES-5, AES-6, AES-8 and AES-10. The integral slider
+   replays the actual four-set candidate counts from the completed experiment.
+   Evidence includes chosen-message samples and per-byte surviving guesses. A
+   verified recovered AES-4 master key is used to decrypt a generated AES-10
+   challenge encrypted with the same key, demonstrating key-reuse compromise,
+   not an attack against full-round AES. Substitution shows the original target,
+   attacker replacement and delivered plaintext block.
+
+The two screens retain state when switching. Original traffic-study tables are
+available in a disclosure beneath the comparison. Their exact repository
+aggregate CSVs are copied to `research/report_reference/`, outside the unchanged
+teammate archive. They are separate from live runs and from the fixed hybrid's
+recorded measurements. The archived round-wise sample counts sum to 90,000.
+
+Restart the Python server after updating backend files. A frontend version guard
+reports an old comparison API instead of rendering incomplete timing/statistics.
+
+## Expanded performance measures
+
+The comparison API accepts 3–15 timed repetitions (UI: 5 or 15), always excluding
+one warm-up. It now reports thread CPU encryption time, mean/min/max encryption
+latency, sample standard deviation, coefficient of variation, paired round-trip
+median, microseconds per padded block and per payload byte, reciprocal-median
+message rate, and padding/ciphertext size. Raw encryption samples are included in
+CSV exports. Min/max and variation describe the collected samples only; no tail
+latency, energy consumption, CPU utilisation or memory-efficiency claims are made.
+
+The frontend can derive per-block cost, throughput and message rate from existing
+API fields. It disables missing CPU/variation views until the server is restarted,
+and explicitly labels the sum-of-medians fallback for round-trip time.

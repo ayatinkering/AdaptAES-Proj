@@ -1,0 +1,17 @@
+.git
+.venv
+.agents
+.codex
+.aws
+.env*
+web/node_modules
+web/dist
+__pycache__
+**/__pycache__
+tests
+results
+python
+data
+scripts
+src
+.workbench

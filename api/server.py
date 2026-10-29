@@ -35,7 +35,7 @@ def start_job(body):
         if len(JOBS)>=20:
             oldest=next(iter(JOBS));JOBS.pop(oldest)
         ident=uuid.uuid4().hex;ctx=mp.get_context('spawn');q=ctx.Queue();p=ctx.Process(target=worker,args=(q,kind,seed,trials),daemon=True)
-        JOBS[ident]={'state':'running','completed':0,'total':trials*4,'process':p,'queue':q,'started':time.monotonic()}
+        JOBS[ident]={'state':'running','completed':0,'total':trials*6,'process':p,'queue':q,'started':time.monotonic()}
         p.start()
     return {'id':ident}
 
@@ -95,6 +95,7 @@ class Handler(BaseHTTPRequestHandler):
             body=json.loads(self.rfile.read(size))
             if not isinstance(body,dict):raise ValueError('Send a JSON object.')
             if self.path=='/api/encrypt':return self.respond(research.encrypt_request(body))
+            if self.path=='/api/stream':return self.respond(research.stream_request(body))
             if self.path=='/api/compare':return self.respond(research.compare_request(body))
             if self.path=='/api/experiments':return self.respond(start_job(body),202)
             self.send_error(404)
