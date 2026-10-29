@@ -1,4 +1,10 @@
 @font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
   font-family: Departure;
   src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
   font-weight: 400;
@@ -15,7 +21,7 @@ body {
   margin: 0;
   background: #090909;
   color: #e9e5dc;
-  font-family: Departure, "Courier New", monospace;
+  font-family: "JetBrains Mono", "Courier New", monospace;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.65;
@@ -97,7 +103,7 @@ h3 {
   font-size: 16px;
 }
 small {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 code,
@@ -199,7 +205,7 @@ nav a.current {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   white-space: nowrap;
 }
@@ -270,7 +276,7 @@ nav a.current {
   flex-wrap: wrap;
 }
 .step {
-  font-size: 11px;
+  font-size: 12px;
   color: #c5b493;
   border: 1px solid #454039;
   min-width: 25px;
@@ -327,7 +333,7 @@ textarea::placeholder {
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .input-meta > span:first-child {
@@ -339,7 +345,7 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   flex-wrap: wrap;
 }
@@ -352,7 +358,7 @@ textarea::placeholder {
   background: none;
   color: #c7c2b7;
   padding: 3px 6px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .thresholds button:hover {
   background: #d6c5a6;
@@ -372,7 +378,7 @@ textarea::placeholder {
   margin-bottom: 24px;
 }
 .key-details summary {
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
   color: #aaa69d;
 }
@@ -392,7 +398,7 @@ textarea::placeholder {
 }
 .key-actions small,
 .key-actions button {
-  font-size: 10px;
+  font-size: 12px;
 }
 .run-row {
   display: flex;
@@ -426,7 +432,7 @@ textarea::placeholder {
   background: #25231f;
 }
 .status {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .selected-cipher {
@@ -437,7 +443,7 @@ textarea::placeholder {
   padding-top: 4px;
 }
 .selected-cipher > div > span {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .selected-cipher h3 {
@@ -449,7 +455,7 @@ textarea::placeholder {
 }
 .bit-label {
   text-align: right;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.9;
   color: #aaa69d;
 }
@@ -462,7 +468,7 @@ textarea::placeholder {
   overflow-x: auto;
 }
 .path-terminal {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .path-line {
@@ -473,7 +479,7 @@ textarea::placeholder {
 }
 .round {
   border: 1px solid #4a463c;
-  font-size: 10px;
+  font-size: 12px;
   padding: 5px 8px;
   white-space: nowrap;
 }
@@ -483,7 +489,7 @@ textarea::placeholder {
   color: #10100f;
 }
 .policy-note {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   max-width: 69ch;
   min-height: 43px;
@@ -510,7 +516,7 @@ textarea::placeholder {
   font-size: 13px;
 }
 .empty-output > span {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   line-height: 1.9;
   margin-top: 8px;
@@ -518,7 +524,7 @@ textarea::placeholder {
 .hex-heading {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 24px;
   margin-bottom: 10px;
@@ -548,7 +554,7 @@ textarea::placeholder {
   gap: 5px;
 }
 .metrics > div > span {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .metrics strong {
@@ -557,10 +563,10 @@ textarea::placeholder {
   white-space: nowrap;
 }
 .metrics small {
-  font-size: 10px;
+  font-size: 12px;
 }
 .measurement {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   margin: 13px 0;
 }
@@ -571,7 +577,7 @@ textarea::placeholder {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .verification > span:first-child {
   color: #d6c5a6;
@@ -586,7 +592,7 @@ textarea::placeholder {
   flex-wrap: wrap;
 }
 .download-row button {
-  font-size: 10px;
+  font-size: 12px;
 }
 .error {
   border-left: 2px solid #d8b3a7;
@@ -605,7 +611,7 @@ textarea::placeholder {
   border-bottom: 1px solid #393732;
 }
 .block-select {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   display: flex;
   gap: 10px;
@@ -614,7 +620,7 @@ textarea::placeholder {
 .block-select select {
   padding: 3px 24px 3px 8px;
   min-height: 30px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .inspection-layout {
   display: grid;
@@ -637,12 +643,12 @@ textarea::placeholder {
   border-left: 2px solid transparent;
   width: 100%;
   text-align: left;
-  font-size: 10px;
+  font-size: 12px;
   padding: 9px 15px;
   color: #aaa69d;
 }
 .operation-list button > span {
-  font-size: 9px;
+  font-size: 12px;
   color: #817765;
 }
 .operation-list button.selected {
@@ -661,7 +667,7 @@ textarea::placeholder {
   flex-direction: column;
   gap: 18px;
   padding: 12px 24px;
-  font-size: 11px;
+  font-size: 12px;
   color: #817c72;
 }
 .state-inspection {
@@ -696,7 +702,7 @@ textarea::placeholder {
   padding: 19px 0 13px;
 }
 .matrix-caption {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   display: block;
   margin-bottom: 8px;
@@ -723,7 +729,7 @@ textarea::placeholder {
 }
 .state-table small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   margin-top: 6px;
 }
 .matrix-arrow {
@@ -731,7 +737,7 @@ textarea::placeholder {
 }
 .state-note {
   max-width: 75ch;
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 6px;
 }
@@ -741,7 +747,7 @@ textarea::placeholder {
   padding-top: 15px;
 }
 .arx-detail h4 {
-  font-size: 11px;
+  font-size: 12px;
 }
 .word-grid {
   display: grid;
@@ -753,13 +759,13 @@ textarea::placeholder {
   display: flex;
   justify-content: space-between;
   gap: 9px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .word-grid code {
   color: #d6c5a6;
 }
 .arx-detail p {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .comparison,
@@ -769,10 +775,10 @@ textarea::placeholder {
   padding: 24px 28px;
 }
 .diffusion .section-title > label {
-  font-size: 11px;
+  font-size: 12px;
 }
 .diffusion select {
-  font-size: 11px;
+  font-size: 12px;
   padding: 4px 20px 4px 8px;
   min-height: 30px;
 }
@@ -811,7 +817,7 @@ textarea::placeholder {
   justify-content: space-between;
   gap: 15px;
   margin: 30px 0 50px;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .file-zone {
@@ -843,12 +849,12 @@ textarea::placeholder {
 }
 .file-label span {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 8px;
 }
 .file-preview {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -864,11 +870,11 @@ textarea::placeholder {
   background: none;
   border: 1px solid #393732;
   color: #c7c2b7;
-  font-size: 10px;
+  font-size: 12px;
   padding: 5px 8px;
 }
 .sample-options small {
-  font-size: 9px;
+  font-size: 12px;
 }
 .experiment {
   border: 1px solid #393732;
@@ -893,7 +899,7 @@ textarea::placeholder {
   background: none;
   border: 0;
   padding: 8px 12px;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .segmented button.active {
@@ -913,18 +919,18 @@ textarea::placeholder {
   border-top: 1px solid #393732;
   padding-top: 20px;
   margin-top: 24px;
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   overflow-wrap: anywhere;
 }
 .result-heading button {
-  font-size: 10px;
+  font-size: 12px;
 }
 .bar-chart {
   margin: 28px 0;
 }
 .chart-caption {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   margin-bottom: 22px;
 }
@@ -934,7 +940,7 @@ textarea::placeholder {
   gap: 18px;
   align-items: center;
   min-height: 45px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .bar-row > svg {
   width: 100%;
@@ -968,7 +974,7 @@ textarea::placeholder {
   max-width: 95ch;
 }
 .scope-note {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   max-width: 105ch;
   line-height: 1.9;
@@ -990,7 +996,7 @@ details > summary {
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 10px;
+  font-size: 12px;
 }
 th,
 td {
@@ -1021,7 +1027,7 @@ td:first-child {
 }
 .experiment-controls label,
 .performance-controls label {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   display: flex;
   flex-direction: column;
@@ -1041,7 +1047,7 @@ td:first-child {
   gap: 20px;
   align-items: center;
   padding: 24px 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 progress {
   accent-color: #d6c5a6;
@@ -1061,7 +1067,7 @@ progress {
   text-align: center;
 }
 .experiment-empty p {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 10px;
 }
@@ -1079,7 +1085,7 @@ progress {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 12px 30px;
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 22px;
   border-top: 1px solid #393732;
@@ -1098,8 +1104,8 @@ progress {
 }
 .curve-chart text {
   fill: #aaa69d;
-  font-size: 10px;
-  font-family: Departure, monospace;
+  font-size: 12px;
+  font-family: "JetBrains Mono", monospace;
 }
 .axis {
   stroke: #585348;
@@ -1131,7 +1137,7 @@ progress {
   display: flex;
   gap: 24px;
   justify-content: center;
-  font-size: 10px;
+  font-size: 12px;
   flex-wrap: wrap;
 }
 .legend-item {
@@ -1174,7 +1180,7 @@ progress {
 }
 .outcome-grid span,
 .outcome-grid small {
-  font-size: 10px;
+  font-size: 12px;
 }
 .block-demo {
   border-top: 1px solid #393732;
@@ -1190,14 +1196,14 @@ progress {
   grid-template-columns: 250px 1fr;
   gap: 20px;
   padding: 9px 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 .block-demo code {
   color: #d6c5a6;
   overflow-wrap: anywhere;
 }
 .block-demo p {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
   margin-top: 15px;
 }
@@ -1234,7 +1240,7 @@ progress {
 }
 .source-hash {
   margin-top: 26px;
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
   overflow-wrap: anywhere;
 }
@@ -1274,14 +1280,14 @@ progress {
   font-weight: 400;
 }
 .paper-stats span {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .paper h3 {
   margin-top: 30px;
 }
 .paper .scope-note {
-  font-size: 11px;
+  font-size: 12px;
 }
 .paper details {
   margin-top: 22px;
@@ -1290,7 +1296,7 @@ progress {
   max-height: 600px;
   overflow: auto;
   white-space: pre-wrap;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   background: #121212;
   padding: 20px;
@@ -1307,11 +1313,11 @@ footer {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .footer-note {
   color: #aaa69d;
-  font-size: 9px;
+  font-size: 12px;
 }
 footer button {
   font-size: 10px !important;
@@ -1339,11 +1345,11 @@ dialog::backdrop {
   overflow-wrap: anywhere;
 }
 .dialog-header span {
-  font-size: 10px;
+  font-size: 12px;
   color: #aaa69d;
 }
 .source-code {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   padding: 26px;
   overflow: auto;
@@ -1359,7 +1365,7 @@ dialog::backdrop {
   overflow-wrap: anywhere;
 }
 .dialog-footer small {
-  font-size: 9px;
+  font-size: 12px;
 }
 .dialog-footer button {
   flex-shrink: 0;
@@ -1426,7 +1432,7 @@ dialog::backdrop {
     font-size: 22px;
   }
   .wordmark-version {
-    font-size: 11px;
+    font-size: 12px;
   }
   nav {
     gap: 24px;
@@ -1466,7 +1472,7 @@ dialog::backdrop {
     grid-template-columns: 190px 1fr;
   }
   .operation-list button {
-    font-size: 9px;
+    font-size: 12px;
     padding-left: 10px;
     gap: 6px;
   }
@@ -1481,17 +1487,17 @@ dialog::backdrop {
   }
   .byte {
     height: 33px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .matrix-arrow {
-    font-size: 11px;
+    font-size: 12px;
   }
   .state-heading h3 {
-    font-size: 11px;
+    font-size: 12px;
   }
   .bar-row {
     grid-template-columns: 160px 1fr 70px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .experiment-heading {
     align-items: flex-start;
@@ -1500,7 +1506,7 @@ dialog::backdrop {
     font-size: 16px;
   }
   .segmented button {
-    font-size: 10px;
+    font-size: 12px;
     padding: 7px 9px;
   }
   .block-demo > div {
@@ -1531,7 +1537,7 @@ dialog::backdrop {
     flex: 1;
   }
   .wordmark-version {
-    font-size: 11px;
+    font-size: 12px;
   }
   nav {
     order: 2;
@@ -1553,11 +1559,11 @@ dialog::backdrop {
     letter-spacing: -0.7px;
   }
   .page-heading p {
-    font-size: 10px;
+    font-size: 12px;
     max-width: 44ch;
   }
   .page-heading > .text-button {
-    font-size: 10px;
+    font-size: 12px;
     max-width: 100px;
     text-align: right;
     padding-top: 8px;
@@ -1587,7 +1593,7 @@ dialog::backdrop {
     gap: 10px;
   }
   .run-row button {
-    font-size: 10px;
+    font-size: 12px;
     padding: 11px;
   }
   .key-actions small {
@@ -1622,7 +1628,7 @@ dialog::backdrop {
     gap: 10px;
   }
   .section-title > .muted {
-    font-size: 9px;
+    font-size: 12px;
     max-width: 110px;
     text-align: right;
   }
@@ -1645,7 +1651,7 @@ dialog::backdrop {
     border-bottom: 2px solid transparent;
     padding: 10px;
     white-space: nowrap;
-    font-size: 10px;
+    font-size: 12px;
   }
   .operation-list button.selected {
     border-left: 0;
@@ -1670,10 +1676,10 @@ dialog::backdrop {
     height: 32px;
   }
   .matrix-caption {
-    font-size: 10px;
+    font-size: 12px;
   }
   .state-heading h3 {
-    font-size: 11px;
+    font-size: 12px;
   }
   .state-table small {
     font-size: 8px;
@@ -1696,7 +1702,7 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
   .comparison > .muted {
-    font-size: 10px;
+    font-size: 12px;
   }
   .diffusion-layout {
     grid-template-columns: 1fr;
@@ -1707,7 +1713,7 @@ dialog::backdrop {
     flex-wrap: wrap;
   }
   .diffusion .section-title > label {
-    font-size: 10px;
+    font-size: 12px;
   }
   .bit-map {
     grid-template-columns: repeat(32, 1fr);
@@ -1719,13 +1725,13 @@ dialog::backdrop {
   .next-section {
     margin: 24px 0 34px;
     align-items: flex-start;
-    font-size: 10px;
+    font-size: 12px;
   }
   .next-section p {
     max-width: 26ch;
   }
   .next-section button {
-    font-size: 10px;
+    font-size: 12px;
     text-align: right;
   }
   .tabs {
@@ -1753,11 +1759,11 @@ dialog::backdrop {
   }
   .segmented button {
     flex: 1;
-    font-size: 11px;
+    font-size: 12px;
     padding: 9px;
   }
   .experiment-explanation {
-    font-size: 11px;
+    font-size: 12px;
   }
   .result-heading {
     flex-direction: column;
@@ -1765,12 +1771,12 @@ dialog::backdrop {
   }
   .result-heading button {
     text-align: left;
-    font-size: 9px;
+    font-size: 12px;
   }
   .bar-row {
     grid-template-columns: 110px 1fr 54px;
     gap: 8px;
-    font-size: 9px;
+    font-size: 12px;
     min-height: 42px;
   }
   .bar-row > span:first-child {
@@ -1780,7 +1786,7 @@ dialog::backdrop {
     margin: 22px 0;
   }
   .chart-caption {
-    font-size: 10px;
+    font-size: 12px;
   }
   .finding {
     padding: 17px 15px;
@@ -1789,10 +1795,10 @@ dialog::backdrop {
     font-size: 12px;
   }
   .finding p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .scope-note {
-    font-size: 10px;
+    font-size: 12px;
   }
   .experiment-controls {
     gap: 12px;
@@ -1810,13 +1816,13 @@ dialog::backdrop {
     flex-basis: 100%;
   }
   .measurement {
-    font-size: 9px;
+    font-size: 12px;
   }
   .job-progress {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .job-progress progress {
     width: 100%;
@@ -1834,16 +1840,16 @@ dialog::backdrop {
     padding: 14px;
   }
   .outcome-grid h3 {
-    font-size: 11px;
+    font-size: 12px;
   }
   .outcome-grid small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .legend {
     gap: 14px;
   }
   .legend-item {
-    font-size: 9px;
+    font-size: 12px;
   }
   .research-boundary {
     margin: 28px 0 36px;
@@ -1852,10 +1858,10 @@ dialog::backdrop {
     font-size: 15px;
   }
   .research-boundary p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .not-tested {
-    font-size: 10px;
+    font-size: 12px;
     gap: 10px;
   }
   .performance-controls {
@@ -1865,10 +1871,10 @@ dialog::backdrop {
   .block-demo > div {
     grid-template-columns: 1fr;
     gap: 5px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .block-demo h3 {
-    font-size: 11px;
+    font-size: 12px;
   }
   .paper h2 {
     font-size: 22px;
@@ -1890,14 +1896,14 @@ dialog::backdrop {
     min-width: 140px;
   }
   .source-index button {
-    font-size: 10px;
+    font-size: 12px;
     gap: 15px;
   }
   .source-index button > span:first-child {
     overflow-wrap: anywhere;
   }
   .source-hash {
-    font-size: 9px;
+    font-size: 12px;
   }
   footer {
     margin-top: 30px;
@@ -1907,7 +1913,7 @@ dialog::backdrop {
     flex-direction: column;
   }
   footer > span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .dialog-header {
     padding: 17px;
@@ -1917,11 +1923,11 @@ dialog::backdrop {
     font-size: 12px;
   }
   .dialog-header .secondary {
-    font-size: 10px;
+    font-size: 12px;
     padding: 7px 10px;
   }
   .source-code {
-    font-size: 10px;
+    font-size: 12px;
     padding: 17px;
   }
   .dialog-footer {
@@ -1935,20 +1941,20 @@ dialog::backdrop {
     text-align: left;
   }
   .raw-toggle {
-    font-size: 11px;
+    font-size: 12px;
   }
   .sample-options small {
     display: block;
   }
   .round {
-    font-size: 9px;
+    font-size: 12px;
     padding: 5px;
   }
   .path-terminal {
-    font-size: 9px;
+    font-size: 12px;
   }
   .policy-note {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1964,4 +1970,631 @@ dialog::backdrop {
 .supporting-evidence .table-wrap {
   max-height: 400px;
   overflow: auto;
+}
+
+/* Pixel typography is reserved for the main display text. */
+.wordmark,
+h1 {
+  font-family: Departure, monospace;
+  text-transform: uppercase;
+}
+.wordmark-version {
+  font-family: "JetBrains Mono", monospace;
+}
+body {
+  line-height: 1.7;
+}
+
+/* Presentation-friendly reading sizes and generous interaction targets. */
+body {
+  font-size: 16px;
+  line-height: 1.8;
+}
+.page-heading {
+  padding: 44px 0 32px;
+}
+h1 {
+  font-size: 32px;
+  line-height: 1.5;
+}
+.page-heading p {
+  font-size: 15px;
+  max-width: 76ch;
+}
+h2,
+.section-title h2 {
+  font-size: 19px;
+}
+h3,
+.state-heading h3 {
+  font-size: 17px;
+}
+nav a,
+.tabs button {
+  font-size: 15px;
+}
+.tabs button {
+  padding-bottom: 16px;
+}
+.input-pane,
+.output-pane {
+  padding: 30px;
+}
+textarea {
+  font-size: 17px;
+  min-height: 180px;
+  line-height: 1.9;
+  padding: 20px;
+}
+select,
+input {
+  font-size: 15px;
+  min-height: 46px;
+}
+.field-label {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.primary,
+.secondary {
+  font-size: 14px;
+  min-height: 48px;
+  padding: 13px 18px;
+}
+.run-row {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.text-button,
+.source-link,
+.key-details summary {
+  font-size: 14px;
+}
+.input-meta,
+.input-meta > span:first-child {
+  font-size: 13px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.thresholds {
+  font-size: 13px;
+  gap: 12px;
+  margin: 26px 0;
+}
+.thresholds button {
+  font-size: 13px;
+  min-height: 34px;
+  padding: 5px 8px;
+}
+.selected-cipher > div > span {
+  font-size: 14px;
+}
+.policy-note,
+.experiment-explanation {
+  font-size: 14px;
+  line-height: 1.9;
+}
+.policy-note {
+  min-height: 66px;
+}
+.round {
+  font-size: 12px;
+  padding: 7px 9px;
+}
+.path-terminal {
+  font-size: 12px;
+}
+.empty-output p {
+  font-size: 16px;
+}
+.empty-output > span {
+  font-size: 14px;
+}
+.hex-output {
+  font-size: 14px;
+  line-height: 2;
+  padding: 18px;
+}
+.hex-heading,
+.metrics > div > span {
+  font-size: 13px;
+}
+.metrics strong {
+  font-size: 23px;
+}
+.measurement,
+.verification,
+.scope-note,
+.state-note {
+  font-size: 13px;
+  line-height: 1.9;
+}
+.verification {
+  padding-top: 18px;
+}
+.download-row button {
+  font-size: 13px;
+}
+.section-title {
+  margin-bottom: 26px;
+}
+.inspector {
+  margin-top: 40px;
+}
+.inspection-layout {
+  grid-template-columns: 290px 1fr;
+}
+.operation-list {
+  max-height: 520px;
+}
+.operation-list button {
+  font-size: 12px;
+  min-height: 43px;
+  padding: 10px 18px;
+}
+.state-inspection {
+  padding: 28px;
+}
+.matrices {
+  padding: 26px 0;
+  gap: 36px;
+}
+.matrix {
+  grid-template-columns: repeat(4, 48px);
+}
+.byte {
+  height: 44px;
+  font-size: 16px;
+}
+.matrix-caption {
+  font-size: 14px;
+}
+.state-table small {
+  font-size: 12px;
+}
+.trace-controls button {
+  height: 38px;
+  width: 38px;
+  font-size: 17px;
+}
+.arx-detail h4 {
+  font-size: 14px;
+}
+.arx-detail p,
+.word-grid > div {
+  font-size: 13px;
+}
+.word-grid {
+  grid-template-columns: 1fr;
+}
+.experiment {
+  padding: 30px;
+}
+.experiment-heading h2 {
+  font-size: 21px;
+}
+.segmented button {
+  font-size: 14px;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.result-heading,
+.result-heading button,
+.chart-caption {
+  font-size: 13px;
+}
+.bar-row {
+  grid-template-columns: 230px 1fr 100px;
+  font-size: 13px;
+  min-height: 52px;
+}
+th,
+td {
+  font-size: 13px;
+  line-height: 1.8;
+  padding: 16px 18px 16px 0;
+}
+.finding {
+  padding: 24px;
+}
+.finding strong {
+  font-size: 17px;
+}
+.finding p,
+.research-boundary p {
+  font-size: 14px;
+  line-height: 1.95;
+}
+.experiment-controls label,
+.performance-controls label {
+  font-size: 14px;
+  gap: 10px;
+}
+.experiment-empty {
+  font-size: 16px;
+}
+.experiment-empty p {
+  font-size: 14px;
+}
+.outcome-grid h3 {
+  font-size: 14px;
+}
+.outcome-grid span,
+.outcome-grid small {
+  font-size: 13px;
+}
+.outcome-grid > div {
+  padding: 22px;
+}
+.not-tested,
+details > summary {
+  font-size: 14px;
+}
+.paper > p {
+  font-size: 16px;
+}
+.paper .scope-note {
+  font-size: 14px;
+}
+.source-code,
+.report-text {
+  font-size: 13px;
+  line-height: 1.9;
+}
+.source-index button {
+  font-size: 14px;
+  min-height: 48px;
+}
+.key-actions small,
+.key-actions button {
+  font-size: 12px;
+}
+.next-section,
+.next-section button {
+  font-size: 14px;
+}
+.explanation {
+  color: #b6b1a7;
+  font-size: 14px;
+  line-height: 1.9;
+  max-width: 88ch;
+  margin: 12px 0 22px;
+}
+
+@media (max-width: 1100px) {
+  .input-pane,
+  .output-pane {
+    padding: 24px;
+  }
+  .inspection-layout {
+    grid-template-columns: 245px 1fr;
+  }
+  .matrix {
+    grid-template-columns: repeat(4, 39px);
+  }
+  .byte {
+    height: 38px;
+    font-size: 14px;
+  }
+  .matrices {
+    gap: 18px;
+  }
+  .bar-row {
+    grid-template-columns: 185px 1fr 85px;
+  }
+}
+@media (max-width: 900px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+  .input-pane {
+    border-right: 0;
+    border-bottom: 1px solid #393732;
+  }
+  .empty-output {
+    min-height: 220px;
+  }
+  .bar-row {
+    grid-template-columns: 165px 1fr 80px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 720px) {
+  body {
+    font-size: 15px;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  .page-heading {
+    padding: 30px 0 26px;
+  }
+  .page-heading p {
+    font-size: 14px;
+  }
+  .page-heading > .text-button {
+    font-size: 12px;
+  }
+  .input-pane,
+  .output-pane,
+  .experiment {
+    padding: 22px 18px;
+  }
+  .section-title h2 {
+    font-size: 17px;
+  }
+  .primary,
+  .secondary {
+    font-size: 13px;
+  }
+  .run-row button {
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+  .inspection-layout {
+    grid-template-columns: 1fr;
+  }
+  .state-inspection {
+    padding: 22px 14px;
+  }
+  .matrix {
+    grid-template-columns: repeat(4, 31px);
+  }
+  .byte {
+    height: 34px;
+    font-size: 13px;
+  }
+  .matrices {
+    gap: 10px;
+  }
+  .state-table small {
+    font-size: 10px;
+  }
+  .state-heading h3 {
+    font-size: 14px;
+  }
+  .operation-list button {
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .bar-row {
+    grid-template-columns: 100px 1fr 64px;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .outcome-grid > div {
+    padding: 16px;
+  }
+  .experiment-heading h2 {
+    font-size: 19px;
+  }
+  .finding {
+    padding: 18px;
+  }
+  .paper > p {
+    font-size: 15px;
+  }
+  .source-index button {
+    font-size: 12px;
+  }
+  nav a {
+    font-size: 13px;
+  }
+  .next-section {
+    flex-direction: column;
+  }
+}
+
+/* Research series colours identify designs; outcome colours identify observations. */
+.design-aes4 {
+  --series: #ef9a91;
+}
+.design-hybrid {
+  --series: #93d4ae;
+}
+.design-aes5 {
+  --series: #e9cc7e;
+}
+.design-aes10 {
+  --series: #9fc4ed;
+}
+.design-reference {
+  --series: #aaa9a5;
+}
+.bar-row .bar-value {
+  fill: var(--series, #aaa9a5);
+}
+.bar-row > span:first-child {
+  color: var(--series, #e9e5dc);
+}
+.series-0 {
+  stroke: #ef9a91;
+}
+.series-1 {
+  stroke: #93d4ae;
+}
+.series-2 {
+  stroke: #e9cc7e;
+}
+.series-3 {
+  stroke: #9fc4ed;
+}
+.line-0 {
+  border-color: #ef9a91;
+  color: #ef9a91;
+}
+.line-1 {
+  border-color: #93d4ae;
+  color: #93d4ae;
+}
+.line-2 {
+  border-color: #e9cc7e;
+  color: #e9cc7e;
+}
+.line-3 {
+  border-color: #9fc4ed;
+  color: #9fc4ed;
+}
+.curve-chart text {
+  font-size: 12px;
+}
+.chart-axis-caption {
+  font-size: 13px;
+  color: #b6b1a7;
+  margin: 12px 0 20px;
+}
+.design-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 30px;
+  margin: 20px 0 24px;
+}
+.design-legend > span {
+  display: grid;
+  grid-template-columns: 8px auto;
+  column-gap: 9px;
+  font-size: 13px;
+  color: var(--series);
+  align-items: center;
+}
+.design-legend i {
+  width: 8px;
+  height: 8px;
+  background: var(--series);
+}
+.design-legend small {
+  grid-column: 2;
+  color: #b6b1a7;
+  font-size: 12px;
+}
+.reading-note {
+  border-left: 2px solid #e9cc7e;
+  padding: 12px 20px;
+  background: #17160f;
+  margin: 20px 0 26px;
+}
+.reading-note strong {
+  color: #e9cc7e;
+  font-weight: 400;
+  font-size: 14px;
+}
+.reading-note p {
+  font-size: 14px;
+  margin-top: 6px;
+  color: #c5c0b5;
+  max-width: 94ch;
+}
+.outcome-grid > div strong,
+.outcome-grid > div h3 {
+  color: var(--series);
+}
+.outcome-grid > div {
+  border-top: 2px solid var(--series);
+}
+.danger-finding {
+  border-left-color: #ef9a91;
+  background: #1c1210;
+}
+.danger-finding strong {
+  color: #ef9a91;
+}
+.demo-guide {
+  margin: 0 0 26px;
+  border: 1px solid #393732;
+  padding: 15px 20px;
+  background: #12120f;
+}
+.demo-guide summary {
+  font-size: 14px;
+  color: #d6c5a6;
+  min-height: 24px;
+}
+.demo-guide ol {
+  padding-left: 24px;
+  margin: 18px 0 5px;
+  max-width: 95ch;
+}
+.demo-guide li {
+  margin: 12px 0;
+  padding-left: 6px;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.demo-guide b {
+  font-weight: 400;
+  color: #e9cc7e;
+}
+.demo-guide code {
+  background: #29261e;
+  padding: 3px 6px;
+  color: #e9e5dc;
+}
+.performance-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #393732;
+  border-bottom: 1px solid #393732;
+  margin: 24px 0 30px;
+}
+.performance-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 22px;
+  border-right: 1px solid #393732;
+}
+.performance-summary > div:first-child {
+  padding-left: 0;
+}
+.performance-summary > div:last-child {
+  border: 0;
+}
+.performance-summary span {
+  font-size: 14px;
+}
+.performance-summary strong {
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--series);
+}
+.performance-summary small {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.performance-controls {
+  flex-wrap: wrap;
+}
+@media (max-width: 720px) {
+  .design-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  .design-legend > span {
+    font-size: 12px;
+  }
+  .design-legend small {
+    font-size: 11px;
+  }
+  .performance-summary {
+    grid-template-columns: 1fr;
+  }
+  .performance-summary > div {
+    padding: 20px 0;
+    border-right: 0;
+    border-bottom: 1px solid #393732;
+  }
+  .demo-guide {
+    padding: 14px 16px;
+  }
+  .demo-guide li,
+  .reading-note p {
+    font-size: 13px;
+  }
+  .performance-controls label {
+    width: 100%;
+  }
+  .bar-row {
+    grid-template-columns: 104px 1fr 66px;
+  }
 }

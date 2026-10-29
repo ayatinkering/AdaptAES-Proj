@@ -145,14 +145,106 @@ function CipherPath({ config }) {
     </div>
   );
 }
+function designClass(name = "") {
+  if (/random/i.test(name)) return "design-reference";
+  if (/ARX/.test(name)) return "design-hybrid";
+  if (/AES-10/.test(name)) return "design-aes10";
+  if (/AES-5/.test(name)) return "design-aes5";
+  if (/AES-4|Original AdaptAES/.test(name)) return "design-aes4";
+  return "design-reference";
+}
+function DesignLegend() {
+  return (
+    <div className="design-legend" aria-label="Chart colour key">
+      {[
+        ["AES-4", "Reduced-round control"],
+        ["AES-4 + ARX", "Hybrid prototype"],
+        ["AES-5", "Extra-round reference"],
+        ["AES-10", "Full-round reference"],
+      ].map(([name, description]) => (
+        <span key={name} className={designClass(name)}>
+          <i aria-hidden="true" />
+          {name}
+          <small>{description}</small>
+        </span>
+      ))}
+    </div>
+  );
+}
+function DemoGuide({ analysis = false }) {
+  return (
+    <details className="demo-guide">
+      <summary>How to try this {analysis ? "experiment" : "workbench"}</summary>
+      {analysis ? (
+        <ol>
+          <li>
+            Start with <b>Integral</b> and choose <b>Run locally</b>.
+          </li>
+          <li>
+            Keep seed <code>20261029</code> and <b>1 trial</b>, then choose{" "}
+            <b>Run experiment</b>.
+          </li>
+          <li>
+            AES-4 should finish with 16 candidates: one correct byte at each of
+            16 positions. The evaluator verifies whether the recovered master
+            key is correct.
+          </li>
+          <li>
+            For the hybrid, inspect whether the original integral equation
+            leaves any candidates. Zero means the equation failed, not that
+            every attack fails.
+          </li>
+          <li>
+            Try <b>Differential</b> and <b>Linear</b> in Recorded mode to
+            compare the full-sample probes against the random reference.
+          </li>
+          <li>
+            Try <b>Block substitution</b> to see the separate message-wrapper
+            integrity issue.
+          </li>
+        </ol>
+      ) : (
+        <ol>
+          <li>
+            Type <code>Hello, AdaptAES!</code> in the text box and keep{" "}
+            <b>AdaptAES–ARX</b> selected.
+          </li>
+          <li>
+            Choose <b>Encrypt &amp; inspect</b>. Check the selected round count,
+            ciphertext and <b>Exact plaintext recovered</b>.
+          </li>
+          <li>
+            In <b>Encryption steps</b>, select the ARX operation to inspect the
+            actual state before and after mixing.
+          </li>
+          <li>
+            Choose the <b>128</b> and <b>129</b> size presets. The first selects
+            AES-4 + ARX; the second selects AES-6.
+          </li>
+          <li>
+            Choose <b>Compare methods</b> for a repeated timing comparison, or
+            change one input bit below the trace.
+          </li>
+          <li>
+            Open <b>Analysis</b> for attacks and <b>Research</b> for the
+            supplied experiment results.
+          </li>
+        </ol>
+      )}
+    </details>
+  );
+}
 function Bars({ rows, metric, label, unit = "" }) {
   const values = rows.map((r) => Number(r[metric]));
-  const max = Math.max(...values, 1) * 1.12;
+  const max = Math.max(...values, Number.EPSILON) * 1.12;
   return (
     <div className="bar-chart">
       <p className="chart-caption">{label}</p>
       {rows.map((r, i) => (
-        <div className="bar-row" key={i}>
+        <div
+          className={`bar-row ${metric === "accepted" ? "design-aes4" : designClass(r.design)}`}
+          key={i}
+        >
           <span>{r.design}</span>
           <svg
             viewBox="0 0 500 25"
@@ -165,9 +257,7 @@ function Bars({ rows, metric, label, unit = "" }) {
               y="5"
               width={(values[i] / max) * 500}
               height="15"
-              className={
-                r.design.includes("ARX") ? "bar-value highlight" : "bar-value"
-              }
+              className="bar-value"
             />
           </svg>
           <span className="num">
@@ -221,6 +311,10 @@ function Curves({ rows }) {
           Chosen plaintext queries per trial
         </text>
       </svg>
+      <p className="chart-axis-caption">
+        Each point is a measured mean after a 256-query set. Lower counts show
+        how the equation filters candidates.
+      </p>
       <div className="legend">
         {rows.map((r, i) => (
           <span key={r.design} className={"legend-item line-" + i}>
@@ -313,7 +407,10 @@ function Workspace({ openSource, onAnalyze }) {
           <h1>
             Cipher workbench<span className="title-dot">.</span>
           </h1>
-          <p>From a message to a state. Inspect what changes, byte by byte.</p>
+          <p>
+            Enter a message, encrypt it, and follow the transformations inside
+            each block.
+          </p>
         </div>
         <button
           className="text-button source-link"
@@ -322,10 +419,11 @@ function Workspace({ openSource, onAnalyze }) {
           Read the cipher <span>↗</span>
         </button>
       </div>
+      <DemoGuide />
       <div className="workbench">
         <section className="input-pane">
           <SectionTitle number="01">
-            Plaintext <span className="muted">/ input</span>
+            Plaintext <span className="muted">/ your input</span>
           </SectionTitle>
           <div
             className="tabs input-tabs"
@@ -528,7 +626,7 @@ function Workspace({ openSource, onAnalyze }) {
               </span>
             }
           >
-            Ciphertext <span className="muted">/ output</span>
+            Ciphertext <span className="muted">/ encrypted output</span>
           </SectionTitle>
           <div className="selected-cipher">
             <div>
@@ -677,7 +775,7 @@ function Workspace({ openSource, onAnalyze }) {
               </button>
             }
           >
-            Matched performance comparison
+            Compare encryption performance
           </SectionTitle>
           <p className="muted">
             {comparison.bytes} bytes · median of five timed runs · same input
@@ -720,7 +818,7 @@ function Workspace({ openSource, onAnalyze }) {
             )
           }
         >
-          Inside the cipher
+          Encryption steps
         </SectionTitle>
         <div className="inspection-layout">
           <div className="operation-list">
@@ -827,7 +925,7 @@ function Workspace({ openSource, onAnalyze }) {
               </label>
             }
           >
-            One bit in. What changes?
+            Change one input bit
           </SectionTitle>
           <div className="diffusion-layout">
             <div>
@@ -998,7 +1096,8 @@ function Analysis({ catalog, openSource }) {
             Attack analysis<span className="title-dot">.</span>
           </h1>
           <p>
-            Controlled experiments. Actual observations. Explicit boundaries.
+            Run an experiment or inspect your teammate’s recorded research
+            results.
           </p>
         </div>
         <button
@@ -1031,6 +1130,7 @@ function Analysis({ catalog, openSource }) {
           </button>
         ))}
       </div>
+      <DemoGuide analysis />
       <section className="experiment">
         <div className="experiment-heading">
           <h2>{TITLES[kind]}</h2>
@@ -1050,6 +1150,19 @@ function Analysis({ catalog, openSource }) {
           </div>
         </div>
         <p className="experiment-explanation">{explanations[kind]}</p>
+        <DesignLegend />
+        <div className="reading-note">
+          <strong>What to look for</strong>
+          <p>
+            {kind === "integral"
+              ? "AES-4 is the attack control. A verified key recovery demonstrates the attack works; no surviving hybrid candidates means the original attack condition was disrupted."
+              : kind === "substitution"
+                ? "Every accepted modified message indicates missing integrity protection. Red bars show successful substitutions, including against full-round AES."
+                : kind === "differential"
+                  ? "Compare each cipher with the random reference. These bars show sampled differences; a small numerical gap alone is not evidence of a weakness."
+                  : "Compare the largest tested bit correlation with the random reference. This is a limited search over selected masks, not a complete security assessment."}
+          </p>
+        </div>
         {isLive ? (
           <>
             <div className="experiment-controls">
@@ -1146,13 +1259,15 @@ function Analysis({ catalog, openSource }) {
                     <Curves rows={result.rows} />
                     <div className="outcome-grid">
                       {result.rows.map((r) => (
-                        <div key={r.design}>
+                        <div key={r.design} className={designClass(r.design)}>
                           <h3>{r.design}</h3>
                           <strong>{r.final_candidates}</strong>
-                          <span>remaining byte guesses</span>
+                          <span>remaining key-byte candidates</span>
                           <small>
                             {r.verified_recoveries === null
-                              ? "Recovery equation did not yield a verified key"
+                              ? r.final_candidates === 0
+                                ? "No candidate satisfies this equation"
+                                : "Key recovery not evaluated"
                               : `${r.verified_recoveries}/${r.trials} master keys verified`}
                           </small>
                         </div>
@@ -1221,7 +1336,7 @@ function Analysis({ catalog, openSource }) {
                   metric="remaining"
                   label="Remaining byte-key guesses after 1,024 queries (20 trials)"
                 />
-                <div className="finding">
+                <div className="finding danger-finding">
                   <strong>AES-4: 20 / 20 master keys recovered.</strong>
                   <p>
                     The unchanged integral equation left zero candidates for
@@ -1239,6 +1354,15 @@ function Analysis({ catalog, openSource }) {
                   }))}
                   metric="bias"
                   label="Mean maximum bit-change bias / 2,048 pairs per key"
+                />
+                <Bars
+                  rows={recorded.map((r) => ({
+                    design: r.design,
+                    count: Number(r.mean_largest_byte_difference_count),
+                  }))}
+                  metric="count"
+                  label="Mean largest output-byte difference count / same experiment"
+                  unit="occurrences"
                 />
                 <p className="scope-note">
                   Eight keys per cipher; random reference from 200 simulated
@@ -1271,7 +1395,7 @@ function Analysis({ catalog, openSource }) {
                   metric="accepted"
                   label="Substituted messages accepted / 100 trials"
                 />
-                <div className="finding">
+                <div className="finding danger-finding">
                   <strong>
                     All four wrappers accepted substituted blocks.
                   </strong>
@@ -1337,6 +1461,7 @@ function Results({ catalog, openSource }) {
   const [section, setSection] = useState("performance"),
     [size, setSize] = useState(256),
     [experiment, setExperiment] = useState("padded"),
+    [metric, setMetric] = useState("median_ms"),
     [report, setReport] = useState(null),
     [error, setError] = useState("");
   const ds = catalog?.datasets || {};
@@ -1346,7 +1471,15 @@ function Results({ catalog, openSource }) {
       : "figures/direct_timing.csv";
   const rows = (ds[speedKey] || [])
     .filter((r) => Number(r.bytes) === size)
-    .map((r) => ({ ...r, median_ms: Number(r.median_ms) }));
+    .map((r) => ({
+      ...r,
+      median_ms: Number(r.median_ms),
+      throughput_mib_s:
+        Number(r.bytes) / 2 ** 20 / (Number(r.median_ms) / 1000),
+    }));
+  const hybridTiming = rows.find((r) => r.design === "AES-4 + ARX")?.median_ms;
+  const referenceTiming = rows.find((r) => r.design === "AES-10")?.median_ms;
+  const fiveTiming = rows.find((r) => r.design === "AES-5")?.median_ms;
   return (
     <>
       <div className="page-heading">
@@ -1354,7 +1487,10 @@ function Results({ catalog, openSource }) {
           <h1>
             Research record<span className="title-dot">.</span>
           </h1>
-          <p>Every result has a method, a sample size and a source.</p>
+          <p>
+            Compare timings and security observations, with the original
+            measurements alongside them.
+          </p>
         </div>
         <button
           className="text-button"
@@ -1396,7 +1532,58 @@ function Results({ catalog, openSource }) {
               View source CSV ↗
             </button>
           </div>
+          <p className="explanation">
+            Choose a message size and compare the recorded implementations.
+            Green identifies the hybrid; the figures below are derived only from
+            this selected experiment.
+          </p>
+          <DesignLegend />
+          <div className="performance-summary">
+            <div className="design-hybrid">
+              <span>Hybrid encryption time</span>
+              <strong>
+                {hybridTiming ? number(hybridTiming) + " ms" : "Not measured"}
+              </strong>
+              <small>{size} bytes / selected experiment</small>
+            </div>
+            <div className="design-aes10">
+              <span>Hybrid speedup vs AES-10</span>
+              <strong>
+                {referenceTiming && hybridTiming
+                  ? number(referenceTiming / hybridTiming, 2) + "×"
+                  : "Not measured"}
+              </strong>
+              <small>
+                {referenceTiming
+                  ? "Same payload and timing method"
+                  : "AES-10 not in this experiment"}
+              </small>
+            </div>
+            <div className="design-aes5">
+              <span>Time saved vs AES-5</span>
+              <strong>
+                {fiveTiming && hybridTiming
+                  ? number((1 - hybridTiming / fiveTiming) * 100, 1) + "%"
+                  : "Not measured"}
+              </strong>
+              <small>Derived from the two measured times</small>
+            </div>
+          </div>
           <div className="performance-controls">
+            <label>
+              Graph metric
+              <select
+                value={metric}
+                onChange={(e) => setMetric(e.target.value)}
+              >
+                <option value="median_ms">
+                  Encryption time (lower is faster)
+                </option>
+                <option value="throughput_mib_s">
+                  Throughput (higher is faster)
+                </option>
+              </select>
+            </label>
             <label>
               Timing experiment
               <select
@@ -1423,9 +1610,9 @@ function Results({ catalog, openSource }) {
           </div>
           <Bars
             rows={rows}
-            metric="median_ms"
-            label={`${experiment === "padded" ? "Padded-message" : "Raw-block"} encryption / recorded Python timings`}
-            unit="ms"
+            metric={metric}
+            label={`${experiment === "padded" ? "Padded-message" : "Raw-block"} ${metric === "median_ms" ? "encryption time / lower is faster" : "throughput / higher is faster"}`}
+            unit={metric === "median_ms" ? "ms" : "MiB/s"}
           />
           <DataTable rows={rows} />
           <p className="scope-note">
