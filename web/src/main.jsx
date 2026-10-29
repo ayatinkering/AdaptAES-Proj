@@ -145,6 +145,99 @@ function CipherPath({ config }) {
     </div>
   );
 }
+function RoundOverview({ config, result, stage, onStage }) {
+  const active = result?.trace[stage]?.name || "";
+  return (
+    <section
+      className="round-overview"
+      aria-label="Round allocation and encryption progress"
+    >
+      <div className="round-overview-heading">
+        <h2>Inside this encryption</h2>
+        <span>
+          {result ? "Verified block trace" : "Selected path · ready to run"}
+        </span>
+      </div>
+      <div className="round-facts">
+        <span>
+          <b>{config.rounds}</b> AES rounds
+        </span>
+        <span>
+          <b>{config.arx ? "2" : "0"}</b> ARX iterations
+        </span>
+        <span>
+          <b>16 B</b> per block
+        </span>
+        <span>
+          <b>128 bit</b> key
+        </span>
+      </div>
+      <div className="round-timeline">
+        <div className="round-card input-round">
+          <strong>Input</strong>
+          <small>Pad → split into blocks</small>
+        </div>
+        {Array.from({ length: config.rounds }, (_, i) => i + 1).flatMap((n) => {
+          const index = result?.trace.findIndex((item) =>
+            item.name.startsWith(`Round ${n} ·`),
+          );
+          const node = (
+            <button
+              key={n}
+              disabled={!result}
+              className={
+                "round-card " +
+                (active.startsWith(`Round ${n} ·`) ? "current-round" : "")
+              }
+              onClick={() => onStage(index)}
+            >
+              <strong>Round {n}</strong>
+              <small>
+                {n === config.rounds
+                  ? "Substitute · shift · key"
+                  : "Substitute · shift · mix · key"}
+              </small>
+            </button>
+          );
+          return n === 2 && config.arx
+            ? [
+                node,
+                <button
+                  key="arx"
+                  disabled={!result}
+                  className={
+                    "round-card arx-round " +
+                    (active.startsWith("ARX") ? "current-round" : "")
+                  }
+                  onClick={() =>
+                    onStage(
+                      result.trace.findIndex((item) =>
+                        item.name.startsWith("ARX"),
+                      ),
+                    )
+                  }
+                >
+                  <strong>ARX mixing</strong>
+                  <small>Add · rotate · XOR × 2</small>
+                </button>,
+              ]
+            : [node];
+        })}
+        <div className="round-card output-round">
+          <strong>Output</strong>
+          <small>
+            {result ? "Decryption verified ✓" : "Ciphertext → verify recovery"}
+          </small>
+        </div>
+      </div>
+      <p>
+        {result
+          ? `Inspecting: ${active}. Select a round or use Replay encryption below.`
+          : "Initial key addition precedes round 1. The final round omits MixColumns."}
+      </p>
+    </section>
+  );
+}
 function designClass(name = "") {
   if (/random/i.test(name)) return "design-reference";
   if (/ARX/.test(name)) return "design-hybrid";
@@ -427,7 +520,7 @@ function Workspace({ openSource, onAnalyze }) {
             Encryption lab<span className="title-dot">.</span>
           </h1>
           <p>
-            Your payload. Automatic round selection. A measured AES comparison.
+            Encrypt a message. See the selected rounds. Compare with AES-10.
           </p>
         </div>
         <button
@@ -798,6 +891,15 @@ function Workspace({ openSource, onAnalyze }) {
           )}
         </section>
       </div>
+      <RoundOverview
+        config={config}
+        result={result}
+        stage={stage}
+        onStage={(index) => {
+          setPlaying(false);
+          setStage(index);
+        }}
+      />
       {comparison && (
         <section className="comparison">
           <SectionTitle
@@ -1179,8 +1281,7 @@ function Analysis({ catalog, openSource }) {
             Attack analysis<span className="title-dot">.</span>
           </h1>
           <p>
-            Run an experiment or inspect your teammate’s recorded research
-            results.
+            Choose a test. Run it locally or inspect the recorded measurements.
           </p>
         </div>
         <button
@@ -1571,8 +1672,8 @@ function Results({ catalog, openSource }) {
             Research record<span className="title-dot">.</span>
           </h1>
           <p>
-            Compare timings and security observations, with the original
-            measurements alongside them.
+            Measured performance, attack observations, and the source behind
+            every result.
           </p>
         </div>
         <button
@@ -1583,6 +1684,26 @@ function Results({ catalog, openSource }) {
         >
           Export measurements ↓
         </button>
+      </div>
+      <div
+        className="research-highlights"
+        aria-label="Recorded research findings"
+      >
+        <div>
+          <span>Integral attack · AES-4</span>
+          <strong>20 / 20</strong>
+          <small>Master keys recovered</small>
+        </div>
+        <div>
+          <span>Same equation · AES-4 + ARX</span>
+          <strong>0 candidates</strong>
+          <small>Across 20 recorded trials</small>
+        </div>
+        <div>
+          <span>Hybrid construction</span>
+          <strong>4 rounds + ARX</strong>
+          <small>Reversible mixing after round 2</small>
+        </div>
       </div>
       <div className="tabs">
         <button
